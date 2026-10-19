@@ -17,7 +17,7 @@ const assert = require('node:assert/strict');
   await page.locator('#strategySelect').selectOption('press');
   assert.match(await page.locator('#tacticsStatus').innerText(), /پرس از جلو/);
   await page.locator('#startBtn').click();
-  await page.waitForTimeout(1400);
+  await page.waitForFunction(() => document.querySelector('#matchTime')?.innerText !== '00:00', undefined, { timeout: 15000 });
   const clockAfterStart = await page.locator('#matchTime').innerText();
   assert.notEqual(clockAfterStart, '00:00', 'match clock should advance after start');
   await page.locator('#pauseBtn').click();
