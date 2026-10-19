@@ -222,9 +222,9 @@
 .room-card small{font-size:11px;color:var(--muted);line-height:1.7}
 .room-card span{font-size:11px;color:var(--green);margin-top:auto}
 @media(max-width:700px){
-#main-nav .nav-item:not([data-view="dashboard"]):not([data-view="tactics"]):not([data-view="liveMatch"]):not([data-view="life"]):not([data-view="room"]){display:none}
+#main-nav .nav-item:not([data-view="dashboard"]):not([data-view="fixtures"]):not([data-view="tactics"]):not([data-view="liveMatch"]):not([data-view="life"]):not([data-view="room"]){display:none}
 #main-nav{justify-content:space-around;overflow:visible}
-#main-nav .nav-item{flex:1 1 20%;max-width:20%;min-width:0}
+#main-nav .nav-item{flex:1 1 16.66%;max-width:16.66%;min-width:0}
 .room-grid{grid-template-columns:1fr}
 }
 
@@ -395,7 +395,7 @@ body{background:radial-gradient(ellipse at 76% -18%,rgba(36,75,127,.42),transpar
  .life-activity-card{grid-template-columns:34px minmax(0,1fr);gap:8px;padding:9px}
  .life-activity-icon{width:34px;height:34px;font-size:17px}
  .life-activity-card .btn{grid-column:2;justify-self:start;padding:6px 11px}
- #main-nav .nav-item:not([data-view="dashboard"]):not([data-view="tactics"]):not([data-view="liveMatch"]):not([data-view="life"]):not([data-view="room"]){display:none}
+ #main-nav .nav-item:not([data-view="dashboard"]):not([data-view="fixtures"]):not([data-view="tactics"]):not([data-view="liveMatch"]):not([data-view="life"]):not([data-view="room"]){display:none}
  #main-nav{justify-content:space-around;overflow:visible}
- #main-nav .nav-item{flex:1 1 20%;max-width:20%;min-width:0}
+ #main-nav .nav-item{flex:1 1 16.66%;max-width:16.66%;min-width:0}
 }
