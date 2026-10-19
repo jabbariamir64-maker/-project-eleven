@@ -242,3 +242,54 @@
 .sponsor-card{display:flex;flex-direction:column;gap:9px;padding:15px;border:1px solid #d9b45b30;border-radius:12px;background:linear-gradient(140deg,#18273a,#111b2a)}
 .sponsor-card b{font-size:14px}.sponsor-card strong{font-size:13px;color:#f0d68b}.sponsor-card small{font-size:11px;color:var(--muted)}
 @media(max-width:700px){.wallet-pill{font-size:9px;padding:6px 7px}.top-actions{flex-wrap:wrap;justify-content:flex-end}.sponsor-grid{grid-template-columns:1fr}}
+
+/* Compact, touch-friendly squad tactics */
+.pitch-toolbar{flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.pitch-toolbar-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.display-switch{display:flex;gap:4px;padding:3px;border:1px solid var(--line);border-radius:10px;background:#0b1423}
+.display-switch .btn{padding:7px 9px;font-size:11px;white-space:nowrap}
+.pitch-toolbar small{font-size:10px}
+.football-pitch{aspect-ratio:.96/1;max-height:520px}
+.pitch-player{width:60px;gap:1px;padding:2px}
+.pitch-shirt{width:28px;height:28px;font-size:10px}
+.pitch-player b{font-size:9px;max-width:60px}
+.pitch-player small{font-size:8px}
+.pitch-face-mode{width:60px}
+.pitch-face{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid var(--kit-secondary,#f4c96b);box-shadow:0 2px 7px #0008;background:#17253a}
+.pitch-face-mode b{max-width:58px}
+.pitch-player.is-selected{filter:drop-shadow(0 0 5px #f4c96b);background:#0b122077;border-radius:9px;outline:1px solid #f4c96b}
+.bench-list{display:flex;gap:7px;overflow-x:auto;padding:5px 1px 9px;scrollbar-width:thin}
+.bench-player{flex:0 0 180px;min-width:0;padding:8px}
+.position-editor{margin-top:8px}
+.player-career{margin-top:12px}
+.player-career .list-row{gap:10px;align-items:center}
+.player-career .list-row small{display:inline;color:var(--muted)}
+.tactics-topline{margin-bottom:10px}
+.tactics-topline>div>p{margin:4px 0;font-size:12px}
+.tactics-layout{gap:10px}
+.tactics-settings{gap:9px;padding:12px}
+.tactics-settings .field-label{margin-bottom:4px}
+.compact-fold summary{padding:10px 12px}
+.compact-fold .fold-body{padding:10px}
+.individual-row{padding:6px 0}
+@media(max-width:700px){
+ .football-pitch{aspect-ratio:.98/1;max-height:410px}
+ .pitch-toolbar{align-items:flex-start}
+ .pitch-toolbar-actions{width:100%;justify-content:space-between}
+ .pitch-toolbar-actions .compact-label{min-width:90px;flex:0 0 112px}
+ .display-switch .btn{font-size:10px;padding:6px 7px}
+ .pitch-player{width:49px}
+ .pitch-shirt{width:25px;height:25px}
+ .pitch-player b{max-width:48px;font-size:8px}
+ .pitch-player small{font-size:7px}
+ .pitch-face{width:28px;height:28px}
+ .pitch-face-mode{width:49px}
+ .pitch-face-mode b{max-width:48px}
+ .bench-player{flex-basis:155px}
+ .tactics-layout{grid-template-columns:minmax(0,1fr);gap:8px}
+ .tactics-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .tactics-settings h3,.tactics-settings>.notice,.tactics-settings>.tactics-advanced,.tactics-settings>.role-panel,.tactics-settings>.tactics-save{grid-column:1/-1}
+ .tactics-settings>.field-label{min-width:0}
+ .tactics-settings .field{min-width:0}
+ .training-row{gap:8px}
+}
