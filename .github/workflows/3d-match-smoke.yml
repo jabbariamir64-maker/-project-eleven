@@ -1,13 +1,14 @@
 name: 3D Match Browser Smoke Test
 on:
   push:
-    branches: [ai/babylon-match-sim, main]
+    branches: [ai/babylon-match-sim, ai/live-match-league-sync, main]
     paths:
       - '3d-match-prototype/**'
       - '.github/workflows/3d-match-smoke.yml'
       - 'tests/3d-match-smoke.cjs'
       - 'tests/3d-match-long.cjs'
       - 'tests/game-integration-smoke.cjs'
+      - 'js/game.js'
   workflow_dispatch:
 permissions:
   contents: read
