@@ -13,3 +13,6 @@
 .tactics-toolbar select{max-width:175px;background:#15263a;color:#f2f7ff;border:1px solid #ffffff24;border-radius:8px;padding:9px 28px 9px 10px;font:inherit}
 #tacticsStatus{margin-inline-start:auto;color:#8bd5ff;font-size:12px}
 @media(max-width:520px){.tactics-toolbar{gap:8px}.tactics-toolbar label{width:100%;justify-content:space-between}.tactics-toolbar select{flex:1;max-width:65%}#tacticsStatus{width:100%;margin:0}}
+
+/* Build 06: compact live match statistics */
+.stats-panel{margin:10px 0;padding:14px 16px;background:#0b1727;border:1px solid #ffffff17;border-radius:14px;color:#eaf2fc}.stats-heading{display:flex;align-items:center;gap:16px;margin-bottom:12px;font-size:12px;color:#9fb2c8}.stats-heading strong{margin-inline-end:auto;color:#f6f9ff;font-size:14px}.stats-heading i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-inline:4px}.stat-blue{background:#168cff}.stat-green{background:#28d99b}.stat-row{display:grid;grid-template-columns:44px 1fr 44px;gap:10px;align-items:center;margin:9px 0;font-variant-numeric:tabular-nums}.stat-row>span{font-weight:750;text-align:center}.stat-label{text-align:center;color:#a8b8cb;font-size:12px}.possession-row{padding-top:8px;border-top:1px solid #ffffff13}
