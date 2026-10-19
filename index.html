@@ -170,8 +170,8 @@ function showPage(id){
  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
  render()
 }
-function playerHTML(p,market=false){
- return `<div class="player"><div class="avatar">${p.icon}</div><div class="info"><strong>${p.name}</strong><small>${p.pos} · ${market?"ارزش €"+p.price+"M":"بازیکن باشگاه"}</small></div><div class="rating">${p.rating}</div>${market?`<button onclick="buyPlayer(${p.id})">خرید</button>`:""}</div>`
+function playerHTML(p,market=false,manage=false){
+ return `<div class="player"><div class="avatar">${p.icon}</div><div class="info"><strong>${p.name}</strong><small>${p.pos} · ${market?"ارزش €"+p.price+"M":"بازیکن باشگاه"}</small>${manage?`<div style="display:flex;gap:5px;margin-top:8px"><button style="padding:7px;font-size:10px" onclick="trainPlayer(${p.id})">تمرین €1M</button><button class="secondary" style="padding:7px;font-size:10px" onclick="releasePlayer(${p.id})">آزادسازی</button></div>`:""}</div><div class="rating">${p.rating}</div>${market?`<button onclick="buyPlayer(${p.id})">خرید</button>`:""}</div>`
 }
 function render(){
  document.getElementById("clubTitle").textContent=state.club;
@@ -192,7 +192,7 @@ function render(){
  document.getElementById("predictionAway").textContent=opponents[state.opponentIndex%opponents.length];
  document.getElementById("predictionStatus").textContent=state.predictionChoiceSubmitted?"پیش‌بینی ثبت شده؛ مسابقه را شروع کن.":state.predictionChoice?("انتخاب فعلی: "+({win:"برد ما",draw:"مساوی",lose:"باخت ما"}[state.predictionChoice])):"هنوز انتخابی نکردی.";
  document.getElementById("predictionHistory").innerHTML=state.predictionHistory.slice(0,8).map(h=>'<div class="card"><b>'+h.opponent+'</b><p class="notice">نتیجه '+h.score+' · '+(h.correct?"پیش‌بینی درست 🎉":"پیش‌بینی نادرست")+(h.reward?" · جایزه "+moneyText(h.reward):"")+'</p></div>').join("")||'<div class="card">هنوز پیش‌بینی‌ای ثبت نشده.</div>';
- document.getElementById("roster").innerHTML=state.players.map(p=>playerHTML(p)).join("");
+ document.getElementById("roster").innerHTML=state.players.map(p=>playerHTML(p,false,true)).join("");
  document.getElementById("marketList").innerHTML=marketPlayers.filter(p=>!state.bought.includes(p.id)).map(p=>playerHTML(p,true)).join("")||'<div class="card">فعلاً بازیکن جدیدی در بازار نیست.</div>';
  document.getElementById("tableBody").innerHTML=[
  {name:state.club,played:state.played,points:state.points,me:true},
@@ -204,7 +204,6 @@ function render(){
  ].sort((a,b)=>b.points-a.points).map((t,i)=>`<tr style="${t.me?"color:#69f0b1":""}"><td>${i+1}</td><td>${t.name}</td><td>${t.played}</td><td>${t.points}</td></tr>`).join("");
 }
 function playMatch(){
- if(state.predictionChoice && !state.predictionChoiceSubmitted){alert("اول پیش‌بینی رایگان را ثبت کن؛ یا اگر نمی‌خواهی پیش‌بینی کنی، انتخابت را پاک کن.");return}
  const my=avg()+Math.random()*20-10;
  const opp=73+Math.random()*18;
  const a=Math.max(0,Math.round(my/22+Math.random()*2));
@@ -230,6 +229,18 @@ function playMatch(){
 function setPrediction(choice){state.predictionChoice=choice;state.predictionChoiceSubmitted=false;saveSilent();render()}
 function submitPrediction(){if(!state.predictionChoice){alert("اول برد، مساوی یا باخت را انتخاب کن.");return}if(state.predictionChoiceSubmitted){alert("پیش‌بینی این مسابقه قبلاً ثبت شده.");return}state.predictionChoiceSubmitted=true;saveSilent();render();alert("پیش‌بینی رایگان ثبت شد! حالا مسابقه را شروع کن.")}
 function upgradeStadium(){if(state.stadium>=5){alert("ورزشگاه به حداکثر سطح رسیده.");return}const cost=state.stadium*5;if(state.money<cost){alert("بودجه کافی نیست؛ هزینه ارتقا "+moneyText(cost)+" است.");return}state.money-=cost;state.stadium++;saveSilent();render();alert("ورزشگاه ارتقا پیدا کرد!")}
+function trainPlayer(id){
+ const p=state.players.find(x=>x.id===id);if(!p)return;
+ if(p.rating>=95){alert("قدرت این بازیکن به حداکثر ۹۵ رسیده.");return}
+ if(state.money<1){alert("بودجه کافی برای تمرین نداری.");return}
+ state.money-=1;p.rating++;saveSilent();render();alert(p.name+" تمرین کرد و قدرتش یک واحد افزایش یافت.");
+}
+function releasePlayer(id){
+ const p=state.players.find(x=>x.id===id);if(!p)return;
+ if(state.players.length<=11){alert("برای حفظ ترکیب اصلی، نمی‌توانی کمتر از ۱۱ بازیکن داشته باشی.");return}
+ if(!confirm("بازیکن "+p.name+" آزاد شود؟ آزادسازی رایگان است و هیچ درآمدی برای باشگاه ندارد."))return;
+ state.players=state.players.filter(x=>x.id!==id);saveSilent();render();alert("بازیکن آزاد شد؛ هیچ پولی دریافت نکردی.");
+}
 function buyPlayer(id){
  const p=marketPlayers.find(x=>x.id===id);
  if(!p||state.bought.includes(id))return;
