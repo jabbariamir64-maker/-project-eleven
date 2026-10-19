@@ -98,3 +98,5 @@
 .position-edit-row small{font-size:9px;color:var(--muted)}
 .position-edit-row select{width:58%;min-width:0;font-size:11px;padding:7px 4px}
 @media(max-width:600px){.position-grid{grid-template-columns:1fr}.position-edit-row select{width:60%}}
+
+.position-code{display:inline-flex;align-items:center;justify-content:center;margin-inline:4px;padding:1px 5px;border:1px solid #4b6b94;border-radius:5px;background:#1a3150;color:#a9d0ff;font-size:10px;font-weight:900;direction:ltr;letter-spacing:.4px}
