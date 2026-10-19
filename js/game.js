@@ -186,8 +186,8 @@ function syncLiveMatchResult(data,frame){
  m.played=true;m.homeGoals=data.homeGoals;m.awayGoals=data.awayGoals;m.stats={home:hs,away:as};m.events=[];
  const timeline=Array.isArray(data.goals)?data.goals.filter(x=>x&&Number.isInteger(x.team)&&[0,1].includes(x.team)).slice(0,40):[];
  const scoreCounts=[0,0];timeline.forEach(x=>{if(scoreCounts[x.team]<(x.team===0?m.homeGoals:m.awayGoals))scoreCounts[x.team]++});
- while(scoreCounts[0]<m.homeGoals){timeline.push({minute:Math.min(89,Math.round((scoreCounts[0]+1)*90/(m.homeGoals+1)),team:0});scoreCounts[0]++}
- while(scoreCounts[1]<m.awayGoals){timeline.push({minute:Math.min(89,Math.round((scoreCounts[1]+1)*90/(m.awayGoals+1)),team:1});scoreCounts[1]++}
+ while(scoreCounts[0]<m.homeGoals){timeline.push({minute:Math.min(89,Math.round((scoreCounts[0]+1)*90/(m.homeGoals+1))),team:0});scoreCounts[0]++}
+ while(scoreCounts[1]<m.awayGoals){timeline.push({minute:Math.min(89,Math.round((scoreCounts[1]+1)*90/(m.awayGoals+1))),team:1});scoreCounts[1]++}
  timeline.sort((x,y)=>(Number(x.minute)||1)-(Number(y.minute)||1));
  const clubForTeam=t=>t===0?h:a, playerForGoal=t=>{const c=clubForTeam(t),attackers=c.players.filter(p=>p.starter&&p.code!=="GK");return attackers.length?attackers[Math.floor(Math.random()*attackers.length)]:c.players.find(p=>p.code!=="GK")||c.players[0]};
  timeline.forEach(ev=>{const t=ev.team,c=clubForTeam(t),p=playerForGoal(t);if(p)p.goals=(p.goals||0)+1;m.events.push({minute:clamp(Math.round(Number(ev.minute)||1),1,90),type:"goal",team:c.id,player:p?.id||null,playerName:p?.name||"گل‌زن",assist:"",text:(p?.name||"بازیکن")+" گل زد؛ نتیجه از موتور سه‌بعدی ثبت شد"})});
