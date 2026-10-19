@@ -190,7 +190,7 @@ function syncLiveMatchResult(data,frame){
  while(scoreCounts[1]<m.awayGoals){timeline.push({minute:Math.min(89,Math.round((scoreCounts[1]+1)*90/(m.awayGoals+1))),team:1});scoreCounts[1]++}
  timeline.sort((x,y)=>(Number(x.minute)||1)-(Number(y.minute)||1));
  const clubForTeam=t=>t===0?h:a, playerForGoal=t=>{const c=clubForTeam(t),attackers=c.players.filter(p=>p.starter&&p.code!=="GK");return attackers.length?attackers[Math.floor(Math.random()*attackers.length)]:c.players.find(p=>p.code!=="GK")||c.players[0]};
- timeline.forEach(ev=>{const t=ev.team,c=clubForTeam(t),p=playerForGoal(t);if(p)p.goals=(p.goals||0)+1;m.events.push({minute:clamp(Math.round(Number(ev.minute)||1),1,90),type:"goal",team:c.id,player:p?.id||null,playerName:p?.name||"گل‌زن",assist:"",text:(p?.name||"بازیکن")+" گل زد؛ نتیجه از موتور سه‌بعدی ثبت شد"})});
+ timeline.forEach(ev=>{const t=ev.team,c=clubForTeam(t),p=(ev.playerId?c.players.find(x=>x.id===ev.playerId):null)||playerForGoal(t);if(p)p.goals=(p.goals||0)+1;m.events.push({minute:clamp(Math.round(Number(ev.minute)||1),1,90),type:"goal",team:c.id,player:p?.id||null,playerName:ev.playerName||p?.name||"گل‌زن",assist:"",text:(ev.playerName||p?.name||"بازیکن")+" گل زد؛ نتیجه از موتور سه‌بعدی ثبت شد"})});
  function updateTable(c,gf,ga){c.played++;c.gf+=gf;c.ga+=ga;if(gf>ga){c.w++;c.points+=3}else if(gf===ga){c.d++;c.points++}else c.l++}
  updateTable(h,m.homeGoals,m.awayGoals);updateTable(a,m.awayGoals,m.homeGoals);
  [h,a].forEach(c=>{let ps=c.players.filter(p=>p.starter&&!p.injury);if(ps.length<7)ps=c.players.filter(p=>!p.injury).slice(0,11);ps.forEach(p=>{p.apps=(p.apps||0)+1;p.fitness=clamp((p.fitness||75)-10,10,100);if(Math.random()<.009)p.injury=1+Math.floor(Math.random()*3)})});
@@ -227,7 +227,17 @@ function liveMatchView(){
  goals.sort((x,y)=>x.minute-y.minute);
  const params=new URLSearchParams({home:h?.name||"میزبان",away:a?.name||"میهمان"});
  const liveEligible=!!(!selected.played&&next&&selected.id===next.id&&selected.round===state.week&&(selected.home===c.id||selected.away===c.id));
- if(liveEligible){params.set("live","1");params.set("fixture",selected.id);params.set("homeId",selected.home);params.set("awayId",selected.away)}
+ const rosterFor3d=teamClub=>{let ps=teamClub.players.filter(p=>p.starter&&!p.injury);if(ps.length<7)ps=teamClub.players.filter(p=>!p.injury).slice(0,11);if(ps.length<7)ps=teamClub.players.slice(0,11);const rank=p=>p.code==="GK"?0:["CB","RB","LB","RWB","LWB"].includes(p.code)?1:["CDM","CM","CAM","RM","LM"].includes(p.code)?2:3;ps=ps.slice().sort((x,y)=>rank(x)-rank(y));return ps.slice(0,11).map((p,i)=>({id:p.id,name:p.name,shirtNumber:Number(p.shirtNumber)||i+1,code:p.code,pace:p.pace,passing:p.pass,shooting:p.shoot,technique:p.dribbling,control:p.ballControl,defending:p.defense,goalkeeping:p.goalkeeping,fitness:p.fitness}))};
+ if(liveEligible){
+  params.set("live","1");params.set("fixture",selected.id);params.set("homeId",selected.home);params.set("awayId",selected.away);
+  params.set("homePlayers",JSON.stringify(rosterFor3d(h)));params.set("awayPlayers",JSON.stringify(rosterFor3d(a)));
+  const color=(v,fallback)=>/^#[0-9a-f]{6}$/i.test(v||"")?v:fallback;
+  params.set("homeColor",color(h?.kitPrimary,"#168cff"));params.set("awayColor",color(a?.kitPrimary,"#28d99b"));
+  const formationKey=state.formation==="4-3-3"?"433":state.formation==="3-5-2"?"352":"442";
+  const mentality=state.mentality||"balanced",tactics=state.tactics||{};
+  const strategyKey=mentality==="defensive"?"defensive":mentality==="attacking"?"attack":tactics.style==="press"||Number(tactics.pressing)>75?"press":"balanced";
+  params.set("formation",formationKey);params.set("strategy",strategyKey);
+ }
  if(selected.played){params.set("hg",String(selected.homeGoals||0));params.set("ag",String(selected.awayGoals||0));params.set("goals",goals.map(x=>x.minute+":"+x.team).join(","))}
  const src="3d-match-prototype/index.html?"+params.toString();
  const goalRows=goals.map(ev=>'<div class="event-row"><time>'+num(ev.minute)+"′"+'</time><span class="event-dot goal-dot">⚽</span><div><b>'+escapeHtml(ev.playerName||"گل")+'</b><small>'+escapeHtml(ev.team===0?h?.name||"میزبان":a?.name||"میهمان")+(ev.assist?" · پاس گل "+escapeHtml(ev.assist):"")+'</small></div></div>').join("");
