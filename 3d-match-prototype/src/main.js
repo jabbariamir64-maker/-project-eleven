@@ -11,6 +11,8 @@
   const replayGoals=(matchParams.get("goals")||"").split(",").filter(Boolean).map(v=>{const q=v.split(":");return {minute:clamp(Number(q[0])||1,1,89),team:Number(q[1])===1?1:0,done:false}}).sort((a,b)=>a.minute-b.minute);
   const homeLabel=matchParams.get("home")||"آبی‌ها",awayLabel=matchParams.get("away")||"سبزها";
   let replayGoalPending=null;
+  if(!window.BABYLON){loading.textContent="موتور سه‌بعدی بارگذاری نشد؛ اتصال اینترنت و دسترسی به cdn.babylonjs.com را بررسی کن.";return;}
+  if(!BABYLON.Engine.isSupported()){loading.textContent="مرورگر یا دستگاه فعلی از WebGL پشتیبانی نمی‌کند؛ بازی را در مرورگر به‌روز باز کن.";return;}
   const engine=new BABYLON.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,adaptToDeviceRatio:true});
   const scene=new BABYLON.Scene(engine); scene.clearColor=new BABYLON.Color4(.025,.055,.085,1);
   const camera=new BABYLON.ArcRotateCamera("broadcast-camera",-Math.PI/2,1.08,102,new BABYLON.Vector3(0,0,0),scene);
