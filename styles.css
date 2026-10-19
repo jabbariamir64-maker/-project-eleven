@@ -222,7 +222,7 @@
 .room-card small{font-size:11px;color:var(--muted);line-height:1.7}
 .room-card span{font-size:11px;color:var(--green);margin-top:auto}
 @media(max-width:700px){
-#main-nav .nav-item:not([data-view="dashboard"]):not([data-view="fixtures"]):not([data-view="social"]):not([data-view="cup"]):not([data-view="room"]){display:none}
+#main-nav .nav-item:not([data-view="dashboard"]):not([data-view="tactics"]):not([data-view="liveMatch"]):not([data-view="life"]):not([data-view="room"]){display:none}
 #main-nav{justify-content:space-around;overflow:visible}
 #main-nav .nav-item{flex:1 1 20%;max-width:20%;min-width:0}
 .room-grid{grid-template-columns:1fr}
