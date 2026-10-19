@@ -111,8 +111,11 @@
     const goalDistance=Math.abs(goalX-owner.root.position.x), shootingLane=Math.abs(owner.root.position.z)<15;
     const strategyShot=team===0?(teamStrategy==="attack"?.12:teamStrategy==="defensive"?-.08:0):0;
     const shotChance=clamp(.04+(progress>22?.12:0)+(progress>34?.18:0)+(shootingLane?.1:0)+(owner.shooting-70)/250+strategyShot, .02,.62);
+    // If a team has not attempted a shot by the final half-hour, force its first sensible central attempt.
+    // This prevents a whole simulated match from ending with no shots due to unlucky pass/dribble RNG.
+    const forcedFirstShot=stats.shots[team]===0&&gameSeconds>=3600&&progress>-8&&Math.abs(owner.root.position.z)<24;
     let action=manual;
-    if(!action){if(goalDistance<24&&shootingLane&&Math.random()<shotChance)action="shot";else if(pressure>(team===0&&teamStrategy==="press"?.48:.65)&&Math.random()<(team===0&&teamStrategy==="attack"?.4:.56))action="pass";else if(Math.random()<.22+owner.technique/280)action="dribble";else action="pass";}
+    if(!action){if((goalDistance<24&&shootingLane&&Math.random()<shotChance)||forcedFirstShot)action="shot";else if(pressure>(team===0&&teamStrategy==="press"?.48:.65)&&Math.random()<(team===0&&teamStrategy==="attack"?.4:.56))action="pass";else if(Math.random()<.22+owner.technique/280)action="dribble";else action="pass";}
     if(action==="shot"){
       lastShooter=owner;owner.kickTimer=.48;stats.shots[team]++;const quality=owner.shooting/100, technique=owner.technique/100, power=clamp(.58+quality*.38+rand(-.12,.1),.45,1);
       const accuracy=clamp((.24+quality*.48+technique*.18)*(1-pressure*.48),.12,.9);
