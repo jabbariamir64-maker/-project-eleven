@@ -61,10 +61,8 @@ const assert = require('node:assert/strict');
     }, undefined, { timeout: 120000 });
     assert.match(await matchFrame.locator('#phaseLabel').innerText(), /نیمه اول/, 'real match reaches half-time');
     await matchFrame.locator('#startBtn').click();
-    await page.waitForFunction(() => {
-      const frame = document.querySelector('#view-root iframe');
-      return frame?.contentDocument?.querySelector('#matchTime')?.innerText === '90:00';
-    }, undefined, { timeout: 120000 });
+    // The parent replaces the live iframe immediately after accepting the full-time
+    // message, so observe the saved league state rather than the child clock after 90:00.
     await page.waitForFunction(({ fixtureId }) => {
       const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
       const m = s?.fixtures?.find(x => x.id === fixtureId);
