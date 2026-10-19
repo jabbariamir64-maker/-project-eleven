@@ -1,5 +1,5 @@
 (()=>{"use strict";
-const D=window.P11_DATA,SKEY="project-eleven-save-v1",$=s=>document.querySelector(s),num=n=>new Intl.NumberFormat("fa-IR").format(n||0),money=n=>num(Math.round(n||0))+" ت",clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const D=window.P11_DATA,SKEY="project-eleven-save-v1",$=s=>document.querySelector(s),num=n=>new Intl.NumberFormat("fa-IR").format(n||0),money=n=>num(Math.round((n||0)/1000))+" سکه",clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const escapeHtml=value=>String(value??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
 const titles={dashboard:"داشبورد باشگاه",squad:"ترکیب تیم",market:"بازار نقل‌وانتقالات",fixtures:"مسابقات و جدول",tactics:"تاکتیک و تمرین",predictions:"پیش‌بینی رایگان",history:"آمار و تاریخچه",cup:"جام حذفی",facilities:"باشگاه و امکانات",social:"شبکه باشگاه‌ها",news:"اخبار فوتبال",messages:"دایرکت",clubProfile:"صفحه باشگاه",playerProfile:"پرونده بازیکن"};let active="dashboard",toastTimer;
 function toast(s){const e=$("#toast");e.textContent=s;e.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove("show"),2500)}
@@ -18,7 +18,43 @@ const FORMATION_POSITIONS={
 "4-3-2-1":[[50,88],[18,69],[39,73],[61,73],[82,69],[30,54],[50,58],[70,54],[37,34],[63,34],[50,20]],
 "3-4-3":[[50,88],[28,70],[50,74],[72,70],[15,52],[38,55],[62,55],[85,52],[22,30],[50,22],[78,30]],
 "4-5-1":[[50,88],[18,69],[39,73],[61,73],[82,69],[15,51],[33,55],[50,58],[67,55],[85,51],[50,23]]};
-function normalizePlayerPositions(players){const defaults=["GK","RB","CB","CB","LB","CDM","CM","CAM","RW","CF","LW","RWB","CB","CM","SS"];players.forEach((p,i)=>{let code=String(p.code||"").toUpperCase();if(!POSITION_META[code]){const old=String(p.position||"");code=old.includes("دروازه")?"GK":old.includes("مدافع")?defaults[i]||"CB":old.includes("هافبک")?defaults[i]||"CM":old.includes("مهاجم")?defaults[i]||"ST":defaults[i]||"CM"}p.code=code;p.position=POSITION_META[code]?.label||"هافبک مرکزی"});return players}
+function normalizePlayerPositions(players){const defaults=["GK","RB","CB","CB","LB","CDM","CM","CAM","RW","CF","LW","RWB","CB","CM","SS"];players.forEach((p,i)=>{let code=String(p.code||"").toUpperCase();if(!POSITION_META[code]){const old=String(p.position||"");code=old.includes("دروازه")?"GK":old.includes("مدافع")?defaults[i]||"CB":old.includes("هافبک")?defaults[i]||"CM":old.includes("مهاجم")?defaults[i]||"ST":defaults[i]||"CM"}p.code=code;p.position=POSITION_META[code]?.label||"هافبک مرکزی";ensurePlayerModel(p)});return players}
+const SKILL_LABELS={pace:"سرعت",acceleration:"شتاب",agility:"چابکی",strength:"قدرت بدنی",stamina:"استقامت",balance:"تعادل",dribbling:"دریبل",ballControl:"کنترل توپ",shoot:"شوت",shotPower:"قدرت شوت",finishing:"تمام‌کنندگی",pass:"پاس",vision:"دید بازی",throughPass:"پاس عمقی",crossing:"ارسال",heading:"ضربه سر",jumping:"پرش",tackling:"تکل",marking:"یارگیری",positioning:"جای‌گیری",reaction:"واکنش",composure:"آرامش",goalkeeping:"دروازه‌بانی"};
+const TRAINABLE_SKILLS=["dribbling","ballControl","pace","acceleration","strength","stamina","balance","shoot","shotPower","finishing","pass","vision","throughPass","crossing","heading","jumping","tackling","marking","positioning","reaction","composure","goalkeeping"];
+function stableSeed(s){let h=2166136261;for(const ch of String(s||"p")){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function skillFallback(p,key,base){const h=stableSeed(String(p.id||p.name)+":"+key);return clamp(Math.round(base+((h%17)-8)),10,110)}
+function calculateOverall(p){
+const weights={
+GK:{goalkeeping:5,reaction:2.2,positioning:1.5,pass:.5,composure:1.1,agility:1.1,jumping:.8},
+CB:{tackling:2.2,marking:2.1,positioning:2.1,strength:1.6,heading:1.4,jumping:1.2,pace:.9,stamina:.8,pass:.7},
+RB:{pace:1.6,acceleration:1.5,tackling:1.5,marking:1.3,stamina:1.5,crossing:1.2,pass:1.1,agility:1.1},
+LB:{pace:1.6,acceleration:1.5,tackling:1.5,marking:1.3,stamina:1.5,crossing:1.2,pass:1.1,agility:1.1},
+RWB:{pace:1.8,acceleration:1.6,stamina:1.7,crossing:1.5,dribbling:1.3,tackling:1.1,pass:1.1},
+LWB:{pace:1.8,acceleration:1.6,stamina:1.7,crossing:1.5,dribbling:1.3,tackling:1.1,pass:1.1},
+CDM:{tackling:1.8,marking:1.6,positioning:1.7,stamina:1.6,pass:1.4,strength:1.2,vision:1.1},
+CM:{pass:1.8,vision:1.7,stamina:1.4,ballControl:1.4,positioning:1.2,throughPass:1.2,tackling:.8,agility:1},
+CAM:{vision:1.8,throughPass:1.8,ballControl:1.7,dribbling:1.6,pass:1.5,finishing:1.1,agility:1.1},
+RM:{pace:1.5,acceleration:1.5,crossing:1.5,dribbling:1.5,pass:1.2,stamina:1.2,ballControl:1.2},
+LM:{pace:1.5,acceleration:1.5,crossing:1.5,dribbling:1.5,pass:1.2,stamina:1.2,ballControl:1.2},
+RW:{pace:1.8,acceleration:1.7,dribbling:1.9,ballControl:1.5,finishing:1.2,crossing:1.3,agility:1.4},
+LW:{pace:1.8,acceleration:1.7,dribbling:1.9,ballControl:1.5,finishing:1.2,crossing:1.3,agility:1.4},
+SS:{finishing:1.8,ballControl:1.6,dribbling:1.4,vision:1.3,throughPass:1.3,pace:1.2,shoot:1.5},
+CF:{finishing:2.2,shoot:1.7,shotPower:1.5,heading:1.5,jumping:1.3,positioning:1.7,strength:1.1,ballControl:1},
+ST:{finishing:2.1,shoot:1.7,shotPower:1.4,heading:1.3,positioning:1.7,pace:1.3,ballControl:1.1,strength:1.1}};
+const w=weights[p.code]||weights.CM;let sum=0,total=0;Object.entries(w).forEach(([k,v])=>{sum+=(Number(p[k])||10)*v;total+=v});return clamp(Math.round(sum/Math.max(.01,total)),10,110)}
+function playerTier(p){const r=calculateOverall(p);return r<20?"استعداد خام":r<30?"نوپا":r<40?"در حال رشد":r<50?"سطح پایه":r<60?"متوسط":r<70?"خوب":r<80?"بسیار خوب":r<90?"حرفه‌ای":r<100?"ستاره":r<106?"فوق‌ستاره":r<110?"افسانه‌ای":"حداکثر توان"}
+function playerValue(p){const r=calculateOverall(p),age=Number(p.age)||24;let ageFactor=age<=20?1.18:age<=24?1.08:age<=28?1:age<=31?.78:age<=34?.5:.24;const posFactor=["CF","RW","LW","ST","SS"].includes(p.code)?1.15:["CB","GK"].includes(p.code)?1.02:.96;const potentialFactor=.85+Math.max(0,Math.min(110,Number(p.potential)||r)-r)/200;return Math.round(Math.pow(Math.max(10,r),3.74)*1.45*ageFactor*posFactor*potentialFactor)}
+function ensurePlayerModel(p){
+const base=clamp(Number(p.rating)||35,10,110),id=String(p.id||p.name||"player");
+const keys=["pace","acceleration","agility","strength","stamina","balance","dribbling","ballControl","shoot","shotPower","finishing","pass","vision","throughPass","crossing","heading","jumping","tackling","marking","positioning","reaction","composure","goalkeeping"];
+keys.forEach(k=>{if(!Number.isFinite(Number(p[k]))){let source=base;if(k==="pace"&&Number.isFinite(Number(p.pace)))source=Number(p.pace);if(k==="shoot"&&Number.isFinite(Number(p.shoot)))source=Number(p.shoot);if(k==="pass"&&Number.isFinite(Number(p.pass)))source=Number(p.pass);if(["tackling","marking","positioning"].includes(k)&&Number.isFinite(Number(p.defense)))source=Number(p.defense);p[k]=skillFallback({id},k,source)}else p[k]=clamp(Math.round(Number(p[k])),10,110)});
+const seed=stableSeed(id),code=p.code||"CM";
+if(!Number.isFinite(Number(p.height))){let lo=168,hi=190;if(code==="GK"){lo=183;hi=198}else if(code==="CB"){lo=182;hi=197}else if(["CF","ST"].includes(code)){lo=176;hi=198}else if(["RW","LW","RM","LM"].includes(code)){lo=164;hi=188}p.height=lo+(seed%(hi-lo+1))}
+if(!Number.isFinite(Number(p.weight))){const frame=((seed>>>7)%13)-6;p.weight=Math.round((Number(p.height)-100)*.84+frame)}
+p.height=clamp(Math.round(Number(p.height)),150,215);p.weight=clamp(Math.round(Number(p.weight)),45,140);
+if(!Number.isFinite(Number(p.potential)))p.potential=clamp(base+8+((seed>>>12)%25),10,110);else p.potential=clamp(Math.round(Number(p.potential)),10,110);
+p.defense=Math.round((p.tackling+p.marking+p.positioning)/3);p.rating=calculateOverall(p);p.value=playerValue(p);return p
+}
 function validStartingXI(c){if(c.players.filter(p=>p.starter).length!==11)c.players.forEach((p,i)=>p.starter=i<11)}
 
 function fresh(){let clubs=D.clubs.map((c,i)=>({...c,players:normalizePlayerPositions(D.makePlayers(i)),budget:i===0?125000000:95000000,capacity:15,division:1,points:0,w:0,d:0,l:0,gf:0,ga:0,played:0,facilities:{stadium:1,training:1,academy:1},fans:12000,academyScoutedSeason:0}));let s={version:1,clubId:"blue",season:1,week:1,clubs,fixtures:fixtures(clubs),cup:cupSeed(clubs,1),market:[],logs:[],predictions:{},social:{following:[],messages:[],profilePosts:{}},training:"balanced",formation:"4-3-3",mentality:"balanced"};s.market=marketSeed(s);return s}
