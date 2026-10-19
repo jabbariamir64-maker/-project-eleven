@@ -50,7 +50,8 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
       awayTackles: await page.locator('#awayTackles').innerText(),
       possession: [await page.locator('#homePossession').innerText(), await page.locator('#awayPossession').innerText()]
     };
-    assert.equal(Number(stats.homeShots) >= 0 && Number(stats.awayShots) >= 0, true);
+    assert.ok(Number(stats.homeShots) + Number(stats.awayShots) > 0, 'AI should generate at least one shot in a full match; stats=' + JSON.stringify(stats) + '; events=' + await page.locator('#eventLog').innerText());
+    assert.ok(Number(stats.homePasses) + Number(stats.awayPasses) > 0, 'AI should attempt passes in a full match');
     assert.equal(parseInt(stats.possession[0]) + parseInt(stats.possession[1]), 100, 'possession percentages total 100');
     await page.locator('#startBtn').click();
     assert.equal(await page.locator('#matchTime').innerText(), '00:00', 'start after full time begins a fresh match');
