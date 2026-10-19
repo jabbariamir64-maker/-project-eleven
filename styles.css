@@ -138,11 +138,17 @@ body[data-theme] .mobile-menu{
 }
 body[data-theme] .sidebar{
   background:rgba(8,13,23,.78);
+  background:color-mix(in srgb,var(--section-head) 78%,transparent);
 }
 body[data-theme] .topbar{
   position:relative;
-  padding:0 0 15px;
-  border-bottom:1px solid var(--glass-edge);
+  padding:12px 12px 15px;
+  margin-top:-6px;
+  border:1px solid var(--glass-edge);
+  border-top:0;
+  border-radius:0 0 18px 18px;
+  background:linear-gradient(135deg,rgba(255,255,255,.035),transparent 62%),rgba(8,13,23,.18);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--section-head) 72%,transparent),transparent 62%);
 }
 body[data-theme] .club-mini{
   background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018)),var(--section-head);
