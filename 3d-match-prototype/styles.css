@@ -6,3 +6,10 @@
 .radar-player{position:absolute;width:5px;height:5px;border-radius:50%;transform:translate(-50%,-50%);z-index:2;box-shadow:0 0 3px #0009}
 .radar-home{background:#55b9ff;border:1px solid #e7f6ff}.radar-away{background:#7df0a2;border:1px solid #f0fff4}.mini-ball{position:absolute;z-index:4;width:5px;height:5px;border-radius:50%;background:#fff;box-shadow:0 0 5px #fff;transform:translate(-50%,-50%)}
 @media(max-width:520px){.mini-map{width:112px;height:68px;left:7px;bottom:7px}.controls button{flex:1 1 calc(50% - 8px)}}
+
+/* Build 05: compact tactics controls */
+.tactics-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 14px;margin:10px 0;background:#0c1828;border:1px solid #ffffff17;border-radius:12px}
+.tactics-toolbar label{display:flex;align-items:center;gap:8px;color:#b7c7d9;font-size:12px}
+.tactics-toolbar select{max-width:175px;background:#15263a;color:#f2f7ff;border:1px solid #ffffff24;border-radius:8px;padding:9px 28px 9px 10px;font:inherit}
+#tacticsStatus{margin-inline-start:auto;color:#8bd5ff;font-size:12px}
+@media(max-width:520px){.tactics-toolbar{gap:8px}.tactics-toolbar label{width:100%;justify-content:space-between}.tactics-toolbar select{flex:1;max-width:65%}#tacticsStatus{width:100%;margin:0}}
