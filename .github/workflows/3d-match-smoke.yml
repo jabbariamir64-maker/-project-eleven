@@ -6,13 +6,14 @@ on:
       - '3d-match-prototype/**'
       - '.github/workflows/3d-match-smoke.yml'
       - 'tests/3d-match-smoke.cjs'
+      - 'tests/3d-match-long.cjs'
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   browser-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,3 +29,5 @@ jobs:
         run: python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/project-eleven-http.log 2>&1 &
       - name: Run browser smoke test
         run: node tests/3d-match-smoke.cjs
+      - name: Run extended full-match test
+        run: node tests/3d-match-long.cjs
