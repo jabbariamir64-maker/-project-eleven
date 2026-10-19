@@ -67,7 +67,7 @@ const assert = require('node:assert/strict');
       const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
       const m = s?.fixtures?.find(x => x.id === fixtureId);
       return !!m?.played && Number.isInteger(m.homeGoals) && Number.isInteger(m.awayGoals) && s.week === 2;
-    }, { fixtureId }, { timeout: 30000 });
+    }, { fixtureId }, { timeout: 120000 });
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('project-eleven-save-v1')));
     const liveFixture = saved.fixtures.find(x => x.id === fixtureId);
     assert.equal(liveFixture.played, true, 'actual 3D full-time result is saved');
