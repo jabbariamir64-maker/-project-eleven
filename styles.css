@@ -234,3 +234,11 @@
 .mission-progress{height:7px;border-radius:20px;background:#27364a;overflow:hidden;margin-top:4px}
 .mission-progress span{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#39d98a,#d9b45b);transition:width .25s ease}
 .mission-card .pill{color:#e5c878;border-color:#d9b45b40;background:#d9b45b12}
+
+.wallet-pill{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border:1px solid #39d98a35;border-radius:10px;background:#122b2a;color:#aaf5d2;font-size:11px;font-weight:800;white-space:nowrap}
+.wallet-diamonds{background:#29243a;border-color:#d9b45b55;color:#f0d68b}
+.dashboard-missions,.sponsor-panel{margin-top:14px}
+.sponsor-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sponsor-card{display:flex;flex-direction:column;gap:9px;padding:15px;border:1px solid #d9b45b30;border-radius:12px;background:linear-gradient(140deg,#18273a,#111b2a)}
+.sponsor-card b{font-size:14px}.sponsor-card strong{font-size:13px;color:#f0d68b}.sponsor-card small{font-size:11px;color:var(--muted)}
+@media(max-width:700px){.wallet-pill{font-size:9px;padding:6px 7px}.top-actions{flex-wrap:wrap;justify-content:flex-end}.sponsor-grid{grid-template-columns:1fr}}
