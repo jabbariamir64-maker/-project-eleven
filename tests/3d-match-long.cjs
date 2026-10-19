@@ -13,8 +13,8 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
     const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
     page.on('pageerror', error => pageErrors.push('desktop: ' + error.message));
     await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForFunction(() => !!window.BABYLON, { timeout: 30000 });
-    await page.waitForFunction(() => document.querySelector('#loading')?.classList.contains('hidden'), { timeout: 30000 });
+    await page.waitForFunction(() => !!window.BABYLON, undefined, { timeout: 30000 });
+    await page.waitForFunction(() => document.querySelector('#loading')?.classList.contains('hidden'), undefined, { timeout: 30000 });
     assert.ok(await page.locator('#gameCanvas').isVisible(), 'canvas visible');
     await page.locator('#cameraBtn').click();
     assert.match(await page.locator('#cameraBtn').innerText(), /تلویزیونی/, 'camera toggle switches view');
@@ -29,12 +29,12 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
     await page.locator('#strategySelect').selectOption('attack');
     assert.match(await page.locator('#tacticsStatus').innerText(), /۳-۵-۲.*هجومی/);
     await page.locator('#startBtn').click();
-    await page.waitForFunction(() => document.querySelector('#matchTime')?.innerText === '45:00', { timeout: 70000 });
+    await page.waitForFunction(() => document.querySelector('#matchTime')?.innerText === '45:00', undefined, { timeout: 70000 });
     assert.match(await page.locator('#phaseLabel').innerText(), /نیمه اول/);
     assert.match(await page.locator('#eventLog').innerText(), /پایان نیمه اول/);
     results.push('full first half reached 45:00 and paused at half-time');
     await page.locator('#startBtn').click();
-    await page.waitForFunction(() => document.querySelector('#matchTime')?.innerText === '90:00', { timeout: 70000 });
+    await page.waitForFunction(() => document.querySelector('#matchTime')?.innerText === '90:00', undefined, { timeout: 70000 });
     assert.match(await page.locator('#phaseLabel').innerText(), /پایان مسابقه/);
     assert.match(await page.locator('#eventLog').innerText(), /پایان مسابقه/);
     results.push('second half reached 90:00 and match ended');
@@ -60,9 +60,9 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
     const replay = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     replay.on('pageerror', error => pageErrors.push('mobile-replay: ' + error.message));
     await replay.goto(BASE + '?home=HOME&away=AWAY&hg=1&ag=1&goals=1:0,2:1', { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await replay.waitForFunction(() => !!window.BABYLON, { timeout: 30000 });
-    await replay.waitForFunction(() => document.querySelector('#loading')?.classList.contains('hidden'), { timeout: 30000 });
-    await replay.waitForFunction(() => document.querySelector('#homeScore')?.innerText === '1' && document.querySelector('#awayScore')?.innerText === '1', { timeout: 15000 });
+    await replay.waitForFunction(() => !!window.BABYLON, undefined, { timeout: 30000 });
+    await replay.waitForFunction(() => document.querySelector('#loading')?.classList.contains('hidden'), undefined, { timeout: 30000 });
+    await replay.waitForFunction(() => document.querySelector('#homeScore')?.innerText === '1' && document.querySelector('#awayScore')?.innerText === '1', undefined, { timeout: 15000 });
     assert.match(await replay.locator('#goalBannerScore').innerText(), /HOME.*1.*1.*AWAY/);
     const mobileMetrics = await replay.evaluate(() => ({ viewport: document.documentElement.clientWidth, page: document.documentElement.scrollWidth, canvas: !!document.querySelector('#gameCanvas') && document.querySelector('#gameCanvas').getBoundingClientRect().width > 0 }));
     assert.equal(mobileMetrics.canvas, true, 'mobile canvas has nonzero width');
