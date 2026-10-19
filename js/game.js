@@ -200,7 +200,7 @@ function syncLiveMatchResult(data,frame){
  if(predictionReward)mine.budget+=predictionReward;
  state.clubs.forEach(c=>c.players.forEach(p=>{p.injury=Math.max(0,(p.injury||0)-1);p.fitness=clamp((p.fitness||70)+4,0,100)}));
  const won=m.home===state.clubId?m.homeGoals>m.awayGoals:m.awayGoals>m.homeGoals,draw=m.homeGoals===m.awayGoals;
- state.missionProgress=state.missionProgress||{matches:0};state.missionProgress.matches=(state.missionProgress.matches||0)+1;refreshDailyMissions();
+ refreshDailyMissions();state.missionProgress.matches=(state.missionProgress.matches||0)+1;
  if(m.home===state.clubId){const sm=stadiumMetrics(mine.facilities?.stadium||1,mine.fans||12000),revenue=sm.estimatedRevenue-sm.maintenance,sponsorIncome=mine.sponsor&&mine.sponsor.season===state.season?mine.sponsor.matchIncome||0:0;mine.budget+=revenue+sponsorIncome;if(mine.sponsor&&mine.sponsor.season!==state.season)mine.sponsor=null;log("درآمد بازی خانگی: "+money(revenue+sponsorIncome),"درآمد باشگاه")}
  mine.fans=Math.max(1000,(mine.fans||12000)+(won?350:draw?120:-100));
  state.week=Math.min(state.clubs.length*2-2,m.round+1);state.broadcastMatchId=m.id;
