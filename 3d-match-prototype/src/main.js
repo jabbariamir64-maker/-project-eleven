@@ -7,6 +7,8 @@
   if(matchParams.get("home"))$("homeTeamName").textContent=matchParams.get("home");
   if(matchParams.get("away"))$("awayTeamName").textContent=matchParams.get("away");
   const replayMode=matchParams.has("hg")&&matchParams.has("ag");
+  const parseRoster=key=>{try{const value=JSON.parse(matchParams.get(key)||"[]");return Array.isArray(value)?value:[]}catch(_){return []}};
+  const rosterData={home:parseRoster("homePlayers"),away:parseRoster("awayPlayers")};
   const replayTargetHome=Math.max(0,Number(matchParams.get("hg"))||0),replayTargetAway=Math.max(0,Number(matchParams.get("ag"))||0);
   const replayGoals=(matchParams.get("goals")||"").split(",").filter(Boolean).map(v=>{const q=v.split(":");return {minute:clamp(Number(q[0])||1,1,89),team:Number(q[1])===1?1:0,done:false}}).sort((a,b)=>a.minute-b.minute);
   const homeLabel=matchParams.get("home")||"آبی‌ها",awayLabel=matchParams.get("away")||"سبزها";
@@ -20,7 +22,8 @@
   const hemi=new BABYLON.HemisphericLight("ambient",new BABYLON.Vector3(0,1,0),scene);hemi.intensity=.95;
   const sun=new BABYLON.DirectionalLight("stadium-light",new BABYLON.Vector3(-.35,-1,.25),scene);sun.position=new BABYLON.Vector3(0,35,-20);sun.intensity=.65;
   const mat=(name,color,emissive=null)=>{const m=new BABYLON.StandardMaterial(name,scene);m.diffuseColor=BABYLON.Color3.FromHexString(color);if(emissive)m.emissiveColor=BABYLON.Color3.FromHexString(emissive);return m;};
-  const grassA=mat("grass-a","#26784c"),grassB=mat("grass-b","#2c8553"),lineMat=mat("field-lines","#e7f5e9"),blueMat=mat("blue-kit","#168cff","#04284c"),greenMat=mat("green-kit","#28d99b","#063d2c"),skinMat=mat("skin","#d7a77e"),darkMat=mat("boots","#14202b"),ballMat=mat("ball-white","#f7f8f6"),goalMat=mat("goal-frame","#f4f7fa"),standMat=mat("stand","#17283b"),seatMat=mat("seat","#31455b");
+  const safeHex=(value,fallback)=>/^#[0-9a-f]{6}$/i.test(value||"")?value:fallback;
+  const grassA=mat("grass-a","#26784c"),grassB=mat("grass-b","#2c8553"),lineMat=mat("field-lines","#e7f5e9"),blueMat=mat("blue-kit",safeHex(matchParams.get("homeColor"),"#168cff"),"#04284c"),greenMat=mat("green-kit",safeHex(matchParams.get("awayColor"),"#28d99b"),"#063d2c"),skinMat=mat("skin","#d7a77e"),darkMat=mat("boots","#14202b"),ballMat=mat("ball-white","#f7f8f6"),goalMat=mat("goal-frame","#f4f7fa"),standMat=mat("stand","#17283b"),seatMat=mat("seat","#31455b");
   const ground=BABYLON.MeshBuilder.CreateGround("pitch",{width:105,height:68,subdivisions:2},scene);ground.material=grassA;ground.position.y=-.15;
   for(let i=0;i<10;i++){const band=BABYLON.MeshBuilder.CreateGround("stripe-"+i,{width:10.5,height:68},scene);band.position.set(-47.25+i*10.5,-.12,0);band.material=i%2?grassA:grassB;}
   function line(name,pts,color=lineMat){const mesh=BABYLON.MeshBuilder.CreateLines(name,{points:pts.map(p=>new BABYLON.Vector3(p[0],.015,p[1]))},scene);mesh.color=color.diffuseColor;return mesh;}
@@ -47,6 +50,7 @@
   const players=[];
   const rand=(a,b)=>a+Math.random()*(b-a), dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
   function makePlayer(team,idx,x,z){
+    const rosterPlayer=(team===0?rosterData.home:rosterData.away)[idx]||{};
     const root=new BABYLON.TransformNode("player-"+team+"-"+idx,scene);
     const body=BABYLON.MeshBuilder.CreateCapsule("body",{height:1.55,radius:.34,tessellation:8,subdivisions:2},scene);body.parent=root;body.position.y=.94;body.material=team===0?blueMat:greenMat;
     const head=BABYLON.MeshBuilder.CreateSphere("head",{diameter:.48,segments:10},scene);head.parent=root;head.position.y=1.92;head.material=skinMat;
@@ -55,12 +59,12 @@
     const shorts=BABYLON.MeshBuilder.CreateBox("shorts",{width:.52,height:.28,depth:.34},scene);shorts.parent=root;shorts.position.y=.48;shorts.material=team===0?blueMat:greenMat;
     const bootMat=mat("boot-"+team+"-"+idx,"#101722");
     for(const shin of [leg,leg2]){const boot=BABYLON.MeshBuilder.CreateBox("boot",{width:.22,height:.12,depth:.36},scene);boot.parent=shin;boot.position.set(0,-.29,.055);boot.material=bootMat;}
-    const numberTexture=new BABYLON.DynamicTexture("shirt-number-texture-"+team+"-"+idx,{width:128,height:128},scene,true);numberTexture.hasAlpha=true;numberTexture.drawText(String(idx+1),null,98,"bold 88px Arial","#ffffff","transparent",true);
+    const numberTexture=new BABYLON.DynamicTexture("shirt-number-texture-"+team+"-"+idx,{width:128,height:128},scene,true);numberTexture.hasAlpha=true;numberTexture.drawText(String(Number(rosterPlayer.shirtNumber)||idx+1),null,98,"bold 88px Arial","#ffffff","transparent",true);
     const numberMaterial=new BABYLON.StandardMaterial("shirt-number-material-"+team+"-"+idx,scene);numberMaterial.diffuseTexture=numberTexture;numberMaterial.opacityTexture=numberTexture;numberMaterial.useAlphaFromDiffuseTexture=true;numberMaterial.emissiveColor=new BABYLON.Color3(.8,.8,.8);numberMaterial.backFaceCulling=false;
     const shirtNumber=BABYLON.MeshBuilder.CreatePlane("shirt-number-"+team+"-"+idx,{width:.28,height:.3},scene);shirtNumber.parent=root;shirtNumber.position.set(0,1.08,-.345);shirtNumber.rotation.y=Math.PI;shirtNumber.material=numberMaterial;
     root.position.set(x,0,z);root.rotation.y=team===0?Math.PI/2:-Math.PI/2;
     // Individual ratings drive choices and ball execution; keep ratings different player to player.
-    const p={team,idx,root,leg,leg2,arm,arm2,goalkeeping:idx===0?rand(62,96):rand(35,60),kickTimer:0,diveTimer:0,diveSide:1,home:new BABYLON.Vector3(x,0,z),target:new BABYLON.Vector3(x,0,z),phase:rand(0,6.28),pace:rand(62,94),passing:rand(48,96),shooting:rand(42,96),technique:rand(45,97),control:rand(48,95),defending:rand(45,94),stamina:100};
+    const p={team,idx,playerId:rosterPlayer.id||null,name:rosterPlayer.name||((team===0?"میزبان ":"میهمان ")+(idx+1)),code:rosterPlayer.code||"",root,leg,leg2,arm,arm2,goalkeeping:Number(rosterPlayer.goalkeeping)|| (idx===0?rand(62,96):rand(35,60)),kickTimer:0,diveTimer:0,diveSide:1,home:new BABYLON.Vector3(x,0,z),target:new BABYLON.Vector3(x,0,z),phase:rand(0,6.28),pace:Number(rosterPlayer.pace)||rand(62,94),passing:Number(rosterPlayer.passing)||rand(48,96),shooting:Number(rosterPlayer.shooting)||rand(42,96),technique:Number(rosterPlayer.technique)||rand(45,97),control:Number(rosterPlayer.control)||rand(48,95),defending:Number(rosterPlayer.defending)||rand(45,94),stamina:clamp(Number(rosterPlayer.fitness)||100,45,100)};
     players.push(p);return p;
   }
   const homeFormation=[[-45,0],[-36,-22],[-36,-8],[-36,8],[-36,22],[-20,-24],[-20,-8],[-20,8],[-20,24],[-7,-9],[-7,9]];
@@ -71,7 +75,7 @@
   const radarDots=players.map(p=>{const dot=document.createElement("span");dot.className="radar-player "+(p.team===0?"radar-home":"radar-away");dot.setAttribute("aria-hidden","true");miniMap.appendChild(dot);return {p,dot};});
   const radarBall=miniMap.querySelector(".mini-ball");
   function updateRadar(){for(const item of radarDots){item.dot.style.left=((item.p.root.position.x+55)/110*100)+"%";item.dot.style.top=((item.p.root.position.z+34)/68*100)+"%";}radarBall.style.left=((ball.position.x+55)/110*100)+"%";radarBall.style.top=((ball.position.z+34)/68*100)+"%";}
-  let running=false, gameSeconds=0, homeScore=0, awayScore=0, owner=players[9], ballVelocity=new BABYLON.Vector3(0,0,0), ballVelocityY=0, actionIn=100, halftime=false, secondHalfStarted=false, matchEnded=false, lastClockMinute=-1, tacticalView=false, simulationSpeed=1;
+  let running=false, gameSeconds=0, homeScore=0, awayScore=0, owner=players[9], lastShooter=null, ballVelocity=new BABYLON.Vector3(0,0,0), ballVelocityY=0, actionIn=100, halftime=false, secondHalfStarted=false, matchEnded=false, lastClockMinute=-1, tacticalView=false, simulationSpeed=1;
   let currentFormation="442", teamStrategy="balanced";
   const stats={shots:[0,0],onTarget:[0,0],passes:[0,0],tackles:[0,0],saves:[0,0],possession:[0,0]};
   let possessionTeam=0, possessionClock=0, keeperSaveLock=0;
@@ -110,7 +114,7 @@
     let action=manual;
     if(!action){if(goalDistance<24&&shootingLane&&Math.random()<shotChance)action="shot";else if(pressure>(team===0&&teamStrategy==="press"?.48:.65)&&Math.random()<(team===0&&teamStrategy==="attack"?.4:.56))action="pass";else if(Math.random()<.22+owner.technique/280)action="dribble";else action="pass";}
     if(action==="shot"){
-      owner.kickTimer=.48;stats.shots[team]++;const quality=owner.shooting/100, technique=owner.technique/100, power=clamp(.58+quality*.38+rand(-.12,.1),.45,1);
+      lastShooter=owner;owner.kickTimer=.48;stats.shots[team]++;const quality=owner.shooting/100, technique=owner.technique/100, power=clamp(.58+quality*.38+rand(-.12,.1),.45,1);
       const accuracy=clamp((.24+quality*.48+technique*.18)*(1-pressure*.48),.12,.9);
       const targetZ=clamp(-owner.root.position.z*(.15+accuracy*.45)+rand(-1,1)*(1.4+(1-accuracy)*8),-8,8);if(Math.abs(targetZ)<3.66)stats.onTarget[team]++;updateStatsUI();
       const duration=clamp(goalDistance/(22+power*19),.55,1.8);
@@ -134,10 +138,10 @@
     if(nearest&&dist(owner.root.position,nearest.root.position)<2.1&&Math.random()>(skill*.72)){stats.tackles[nearest.team]++;updateStatsUI();owner=nearest;owner.kickTimer=.18;ballVelocity.set(0,0,0);ballVelocityY=0;ball.position.set(owner.root.position.x,.4,owner.root.position.z);actionIn=rand(55,95);log("🛡️ تکل موفق؛ مدافع مالکیت توپ را گرفت.");}
     else{ballVelocity.set(0,0,0);actionIn=rand(80,140);log(skill>.78?"دریبل موفق و حرکت رو به جلو.":"بازیکن توپ را جلو می‌برد.");}
   }
-  function restartAfterGoal(){ballVelocity.set(0,0,0);ballVelocityY=0;players.forEach(p=>{p.root.position.copyFrom(p.home);p.target.copyFrom(p.home);p.root.rotation.z=0;p.diveTimer=0;p.kickTimer=0;});owner=players[(homeScore+awayScore)%2===0?9:20];ball.position.set(owner.root.position.x,.4,owner.root.position.z);actionIn=110;}
+  function restartAfterGoal(){lastShooter=null;ballVelocity.set(0,0,0);ballVelocityY=0;players.forEach(p=>{p.root.position.copyFrom(p.home);p.target.copyFrom(p.home);p.root.rotation.z=0;p.diveTimer=0;p.kickTimer=0;});owner=players[(homeScore+awayScore)%2===0?9:20];ball.position.set(owner.root.position.x,.4,owner.root.position.z);actionIn=110;}
   let goalBannerTimer=null;
   function showGoalBanner(team){const banner=$("goalBanner");if(!banner)return;$("goalBannerText").textContent="GOOOAL!";$("goalBannerScore").textContent=homeLabel+" "+homeScore+" — "+awayScore+" "+awayLabel;banner.classList.add("visible");clearTimeout(goalBannerTimer);goalBannerTimer=setTimeout(()=>banner.classList.remove("visible"),2600);}
-  function goal(team){if(team===0)homeScore++;else awayScore++;goalTimeline.push({minute:clamp(Math.floor(gameSeconds/60),1,90),team});log("⚽ گل برای "+(team===0?homeLabel:awayLabel)+"!");showGoalBanner(team);restartAfterGoal();ui();}
+  function goal(team){if(team===0)homeScore++;else awayScore++;const scorer=lastShooter&&lastShooter.team===team?lastShooter:null;goalTimeline.push({minute:clamp(Math.floor(gameSeconds/60),1,90),team,playerId:scorer?.playerId||null,playerName:scorer?.name||""});log("⚽ گل برای "+(team===0?homeLabel:awayLabel)+"!");showGoalBanner(team);restartAfterGoal();ui();}
   function update(dt){
     if(!running)return;
     dt*=simulationSpeed;
@@ -212,5 +216,5 @@
   scene.onBeforeRenderObservable.add(()=>update(Math.min(engine.getDeltaTime()/1000,.05)));
   engine.runRenderLoop(()=>scene.render());window.addEventListener("resize",()=>engine.resize());
   canvas.addEventListener("dblclick",()=>{tacticalView=!tacticalView;camera.beta=tacticalView?.16:1.08;camera.radius=tacticalView?112:102;camera.lowerBetaLimit=tacticalView?.12:.72;camera.upperBetaLimit=tacticalView?.35:1.35;$("cameraBtn").textContent=tacticalView?"🎥 نمای تلویزیونی":"🎥 نمای تاکتیکی";});
-  scene.executeWhenReady(()=>loading.classList.add("hidden"));applyFormation("442",false);reset();updateRadar();if(replayMode){running=true;log("▶ بازپخش خودکار شروع شد؛ نتیجه نهایی با گزارش مسابقه هماهنگ است.");ui();}
+  const requestedFormation=["442","433","352"].includes(matchParams.get("formation"))?matchParams.get("formation"):"442";const requestedStrategy=["balanced","press","defensive","attack"].includes(matchParams.get("strategy"))?matchParams.get("strategy"):"balanced";$("formationSelect").value=requestedFormation;$("strategySelect").value=requestedStrategy;scene.executeWhenReady(()=>loading.classList.add("hidden"));applyFormation(requestedFormation,false);updateStrategy(requestedStrategy);reset();updateRadar();if(replayMode){running=true;log("▶ بازپخش خودکار شروع شد؛ نتیجه نهایی با گزارش مسابقه هماهنگ است.");ui();}
 })();
