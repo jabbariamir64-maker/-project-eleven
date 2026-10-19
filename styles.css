@@ -199,3 +199,19 @@
 .color-swatch:focus,.color-swatch:hover{outline:2px solid var(--green);outline-offset:3px}
 .setup-footnote{text-align:center;color:var(--muted);font-size:11px;margin-top:17px}
 @media(max-width:520px){.setup-mode .main-area{padding:14px}.setup-brand{margin-bottom:22px}.setup-options{gap:8px}.setup-option{padding:12px;min-height:112px}.setup-actions{flex-direction:column-reverse}.kit-preview{justify-content:flex-start}.color-picker{padding:9px}}
+
+/* Final P11 theme: navy + green with restrained gold */
+:root{--bg:#0b1220;--panel:#131f32;--panel-2:#192940;--line:#2a3b52;--green:#39d98a;--gold:#d9b45b;--text:#f4f7fb;--muted:#a7b4c7}
+.nav-item.active{border-color:#39d98a45;box-shadow:inset 3px 0 0 var(--green)}
+.club-mini .club-crest{background:linear-gradient(145deg,#1b3550,#112238);border:1px solid #d9b45b45}
+.hero-card{border-color:#d9b45b35;background:radial-gradient(circle at 85% 20%,#d9b45b12,transparent 35%),linear-gradient(125deg,#172b43,#101a2b)}
+.stat-card{border-color:#2a3b52}
+.stat-card .stat-value{color:#f4f7fb}
+.btn.primary,.btn.green{box-shadow:0 5px 18px #39d98a1c}
+.shirt-number{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 5px;border-radius:6px;background:#d9b45b18;color:#e5c878;border:1px solid #d9b45b44;font-size:10px;font-weight:900;direction:ltr}
+.player-heading p{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.club-kit-mini{width:74px;height:76px;position:relative;display:grid;place-items:center;clip-path:polygon(25% 0,40% 9%,60% 9%,75% 0,100% 18%,84% 39%,74% 31%,74% 100%,26% 100%,26% 31%,16% 39%,0 18%);background:var(--kit-primary);filter:drop-shadow(0 9px 14px #0005)}
+.club-kit-mini:before{content:"";position:absolute;inset:0 auto 0 23%;width:8px;background:var(--kit-secondary)}
+.club-kit-mini:after{content:"";position:absolute;top:7px;width:20px;height:11px;border:3px solid var(--kit-secondary);border-top:0;border-radius:0 0 12px 12px}
+.club-kit-mini b{margin-top:10px;color:var(--kit-secondary);font-size:19px;font-weight:1000}
+@media(max-width:540px){.player-heading p{font-size:11px}.shirt-number{min-width:22px;height:20px}}
