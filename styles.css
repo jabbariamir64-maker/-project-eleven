@@ -399,3 +399,23 @@ body{background:radial-gradient(ellipse at 76% -18%,rgba(36,75,127,.42),transpar
  #main-nav{justify-content:space-around;overflow:visible}
  #main-nav .nav-item{flex:1 1 16.66%;max-width:16.66%;min-width:0}
 }
+
+/* Broadcast centre: match-by-match viewing and highlights */
+.broadcast-scoreboard{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px;padding:18px;margin:14px 0;background:linear-gradient(135deg,rgba(24,48,76,.95),rgba(10,20,34,.98));border:1px solid rgba(120,170,220,.22);border-radius:18px}
+.broadcast-club{display:flex;align-items:center;justify-content:center;gap:10px;min-width:0;text-align:center;flex-direction:column}
+.broadcast-club b{overflow-wrap:anywhere}
+.broadcast-score{text-align:center;white-space:nowrap}
+.broadcast-score strong{display:block;font-size:clamp(24px,4vw,42px);font-weight:900;letter-spacing:2px}
+.broadcast-score small{display:block;color:var(--muted,#9eafc5);margin-top:6px}
+.broadcast-all-matches{margin-top:16px}
+.broadcast-fixtures-list{display:grid;gap:9px;margin-top:14px}
+.broadcast-fixture{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px;border:1px solid var(--line,rgba(130,160,190,.15));border-radius:14px;background:rgba(255,255,255,.018)}
+.broadcast-fixture.is-selected{border-color:rgba(78,157,255,.7);background:rgba(43,117,202,.11)}
+.broadcast-fixture-teams{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px}
+.broadcast-fixture-teams span:first-child{text-align:right}
+.broadcast-fixture-teams span:last-child{text-align:left}
+.broadcast-fixture-teams b{white-space:nowrap;font-size:15px}
+.broadcast-fixture-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.broadcast-fixture-actions .btn{padding:7px 10px;font-size:12px}
+.broadcast-all-matches .toolbar label{display:flex;align-items:center;gap:8px}
+@media(max-width:680px){.broadcast-scoreboard{gap:6px;padding:12px}.broadcast-club .club-badge{font-size:22px}.broadcast-club b{font-size:12px}.broadcast-fixture{grid-template-columns:1fr}.broadcast-fixture-teams{gap:6px}.broadcast-fixture-teams span{font-size:12px}.broadcast-fixture-actions{justify-content:flex-end}.broadcast-fixture-actions .btn{flex:1}.broadcast-all-matches .toolbar label{width:100%;justify-content:space-between}.broadcast-all-matches .toolbar .field{max-width:65%}}
