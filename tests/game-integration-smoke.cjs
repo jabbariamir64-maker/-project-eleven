@@ -27,8 +27,37 @@ const assert = require('node:assert/strict');
     assert.match(src, /away=/, 'match frame receives away club name');
     assert.ok(await page.frameLocator('#view-root iframe').locator('#gameCanvas').isVisible(), '3D canvas is visible inside the main game');
     assert.ok(await page.frameLocator('#view-root iframe').locator('#miniMap').isVisible(), 'tactical mini-map is visible inside the main game');
+    assert.match(src, /live=1/, 'next user fixture is opened in live-sync mode');
+    const fixtureId = new URL(src, 'http://127.0.0.1:4173/').searchParams.get('fixture');
+    const homeId = new URL(src, 'http://127.0.0.1:4173/').searchParams.get('homeId');
+    const awayId = new URL(src, 'http://127.0.0.1:4173/').searchParams.get('awayId');
+    assert.ok(fixtureId && homeId && awayId, 'live iframe receives fixture and club identifiers');
+    // Send a representative full-time result from the real child-frame origin/source to exercise league persistence.
+    await page.frameLocator('#view-root iframe').locator('body').evaluate(() => {
+      const p = new URLSearchParams(location.search);
+      window.parent.postMessage({
+        type: 'PROJECT_ELEVEN_MATCH_RESULT',
+        fixtureId: p.get('fixture'), homeId: p.get('homeId'), awayId: p.get('awayId'),
+        homeGoals: 2, awayGoals: 1,
+        goals: [{ minute: 17, team: 0 }, { minute: 53, team: 1 }, { minute: 84, team: 0 }],
+        stats: {
+          home: { shots: 8, onTarget: 4, passes: 76, tackles: 9, saves: 2, possession: 54 },
+          away: { shots: 5, onTarget: 2, passes: 61, tackles: 7, saves: 2, possession: 46 }
+        }
+      }, location.origin);
+    });
+    await page.waitForFunction(({ fixtureId }) => {
+      const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
+      const m = s?.fixtures?.find(x => x.id === fixtureId);
+      return !!m?.played && m.homeGoals === 2 && m.awayGoals === 1 && s.week === 2;
+    }, { fixtureId }, { timeout: 30000 });
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('project-eleven-save-v1')));
+    const liveFixture = saved.fixtures.find(x => x.id === fixtureId);
+    assert.equal(liveFixture.stats.home.shots, 8, 'live match stats are persisted');
+    assert.equal(liveFixture.events.filter(x => x.type === 'goal').length, 3, 'goal timeline is persisted');
+    assert.ok(saved.fixtures.filter(x => x.round === liveFixture.round).every(x => x.played), 'the full league round is completed exactly once');
     assert.deepEqual(errors, [], 'main game and embedded match have no uncaught page errors');
-    console.log(JSON.stringify({ result: 'PASS', checks: ['club onboarding completed','live match navigation works','iframe points to 3D match prototype with club names','Babylon scene loads inside main game','canvas and radar visible','no uncaught page errors'], iframeSrc: src, errors }, null, 2));
+    console.log(JSON.stringify({ result: 'PASS', checks: ['club onboarding completed','live match navigation works','iframe points to 3D match prototype with club names','Babylon scene loads inside main game','canvas and radar visible','live full-time score and stats persisted','all fixtures in round completed','league week advanced once','no uncaught page errors'], fixtureId, score: [liveFixture.homeGoals, liveFixture.awayGoals], week: saved.week, errors }, null, 2));
   } finally {
     await browser.close();
   }
