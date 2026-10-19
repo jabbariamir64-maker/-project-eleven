@@ -33,11 +33,12 @@
   }
   for(const side of [-1,1]){const stand=BABYLON.MeshBuilder.CreateBox("stand",{width:112,height:5,depth:7},scene);stand.position.set(0,1.8,side*39);stand.material=standMat;for(let r=0;r<3;r++){const row=BABYLON.MeshBuilder.CreateBox("seat-row",{width:108,height:.16,depth:.4},scene);row.position.set(0,.4+r*.65,side*(36.5+r*1.6));row.material=seatMat;}}
   // Lightweight instanced crowd: varied seat colors, one draw-call group per material.
+  const randomBetween=(a,b)=>a+Math.random()*(b-a);
   const crowdColors=["#dce8f3","#4d91c9","#e3b65b","#c85c6b","#42b58d","#7e8ba5"];
   const crowdBases=crowdColors.map((color,i)=>{const m=mat("crowd-material-"+i,color);const base=BABYLON.MeshBuilder.CreateBox("crowd-instance-base-"+i,{width:.38,height:.62,depth:.3},scene);base.material=m;base.position.set(0,-100-i,0);return base;});
-  const addSpectator=(x,y,z)=>{const base=crowdBases[Math.floor(Math.random()*crowdBases.length)];const fan=base.createInstance("spectator");fan.position.set(x,y,z);fan.rotation.y=rand(-.16,.16);};
-  for(const side of [-1,1]){for(let x=-52;x<=52;x+=2.6){for(let row=0;row<5;row++){addSpectator(x+rand(-.35,.35),1.45+row*.42,side*(36.4+row*1.35));}}}
-  for(const end of [-1,1]){for(let z=-30;z<=30;z+=3.1){for(let row=0;row<3;row++){addSpectator(end*(54.4+row*1.35),1.35+row*.48,z+rand(-.3,.3));}}}
+  const addSpectator=(x,y,z)=>{const base=crowdBases[Math.floor(Math.random()*crowdBases.length)];const fan=base.createInstance("spectator");fan.position.set(x,y,z);fan.rotation.y=randomBetween(-.16,.16);};
+  for(const side of [-1,1]){for(let x=-52;x<=52;x+=2.6){for(let row=0;row<5;row++){addSpectator(x+randomBetween(-.35,.35),1.45+row*.42,side*(36.4+row*1.35));}}}
+  for(const end of [-1,1]){for(let z=-30;z<=30;z+=3.1){for(let row=0;row<3;row++){addSpectator(end*(54.4+row*1.35),1.35+row*.48,z+randomBetween(-.3,.3));}}}
   // Stadium floodlight masts and glowing lamp banks frame the pitch.
   const mastMat=mat("floodlight-mast","#65778a"),lampMat=mat("floodlight-glow","#d8efff","#b8dcff");
   for(const x of [-55,55])for(const z of [-35,35]){const mast=BABYLON.MeshBuilder.CreateCylinder("floodlight-mast",{height:13,diameter:.28,tessellation:8},scene);mast.position.set(x,6.5,z);mast.material=mastMat;const bank=BABYLON.MeshBuilder.CreateBox("floodlight-bank",{width:2.3,height:.65,depth:.45},scene);bank.position.set(x,13,z);bank.material=lampMat;}
