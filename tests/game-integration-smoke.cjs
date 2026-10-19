@@ -49,30 +49,32 @@ const assert = require('node:assert/strict');
     assert.ok(['balanced', 'press', 'defensive', 'attack'].includes(rosterData.strategy), 'saved team mentality is mapped into the 3D engine');
     assert.match(rosterData.homeColor, /^#[0-9a-f]{6}$/i, 'home kit color is passed into the 3D engine');
     assert.match(rosterData.awayColor, /^#[0-9a-f]{6}$/i, 'away kit color is passed into the 3D engine');
-    // Send a representative full-time result from the real child-frame origin/source to exercise league persistence.
-    await page.frameLocator('#view-root iframe').locator('body').evaluate(() => {
-      const p = new URLSearchParams(location.search);
-      window.parent.postMessage({
-        type: 'PROJECT_ELEVEN_MATCH_RESULT',
-        fixtureId: p.get('fixture'), homeId: p.get('homeId'), awayId: p.get('awayId'),
-        homeGoals: 2, awayGoals: 1,
-        goals: [{ minute: 17, team: 0 }, { minute: 53, team: 1 }, { minute: 84, team: 0 }],
-        stats: {
-          home: { shots: 8, onTarget: 4, passes: 76, tackles: 9, saves: 2, possession: 54 },
-          away: { shots: 5, onTarget: 2, passes: 61, tackles: 7, saves: 2, possession: 46 }
-        }
-      }, location.origin);
-    });
+    // Run a real 90-minute match inside the main game's iframe. The child frame must
+    // post its own final score/stats; the parent must persist them and finish the round.
+    const matchFrame = page.frameLocator('#view-root iframe');
+    await matchFrame.locator('#speedBtn').click();
+    assert.match(await matchFrame.locator('#speedBtn').innerText(), /2×/, 'match speed can be set to 2x');
+    await matchFrame.locator('#startBtn').click();
+    await page.waitForFunction(() => {
+      const frame = document.querySelector('#view-root iframe');
+      return frame?.contentDocument?.querySelector('#matchTime')?.innerText === '45:00';
+    }, undefined, { timeout: 120000 });
+    assert.match(await matchFrame.locator('#phaseLabel').innerText(), /نیمه اول/, 'real match reaches half-time');
+    await matchFrame.locator('#startBtn').click();
+    // The parent replaces the live iframe immediately after accepting the full-time
+    // message, so observe the saved league state rather than the child clock after 90:00.
     await page.waitForFunction(({ fixtureId }) => {
       const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
       const m = s?.fixtures?.find(x => x.id === fixtureId);
-      return !!m?.played && m.homeGoals === 2 && m.awayGoals === 1 && s.week === 2;
-    }, { fixtureId }, { timeout: 30000 });
+      return !!m?.played && Number.isInteger(m.homeGoals) && Number.isInteger(m.awayGoals) && s.week === 2;
+    }, { fixtureId }, { timeout: 120000 });
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('project-eleven-save-v1')));
     const liveFixture = saved.fixtures.find(x => x.id === fixtureId);
-    assert.equal(liveFixture.stats.home.shots, 8, 'live match stats are persisted');
-    assert.equal(liveFixture.events.filter(x => x.type === 'goal').length, 3, 'goal timeline is persisted');
+    assert.equal(liveFixture.played, true, 'actual 3D full-time result is saved');
+    assert.ok(liveFixture.stats.home.shots >= 0 && liveFixture.stats.away.shots >= 0, 'live match stats are persisted');
+    assert.equal(liveFixture.events.filter(x => x.type === 'goal').length, liveFixture.homeGoals + liveFixture.awayGoals, 'goal timeline matches the final score');
     assert.ok(saved.fixtures.filter(x => x.round === liveFixture.round).every(x => x.played), 'the full league round is completed exactly once');
+    assert.equal(saved.week, 2, 'league week advances exactly once after full time');
     assert.deepEqual(errors, [], 'main game and embedded match have no uncaught page errors');
     console.log(JSON.stringify({ result: 'PASS', checks: ['club onboarding completed','live match navigation works','iframe points to 3D match prototype with club names','Babylon scene loads inside main game','canvas and radar visible','actual starting XIs, player attributes, kits, and tactics are connected','live full-time score and stats persisted','all fixtures in round completed','league week advanced once','no uncaught page errors'], fixtureId, score: [liveFixture.homeGoals, liveFixture.awayGoals], week: saved.week, errors }, null, 2));
   } finally {
