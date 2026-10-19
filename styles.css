@@ -94,3 +94,195 @@ body[data-theme="training"] .pitch{background:repeating-linear-gradient(0deg,#12
 body[data-theme="store"] .stat-value,body[data-theme="store"] .gold{color:var(--gold)}
 body[data-theme="player-market"] .list-row b{color:var(--section-accent)}
 @media(prefers-reduced-motion:reduce){body[data-theme],body[data-theme] *{transition:none!important}}
+
+
+/* ─────────────────────────────────────────────────────────────
+   PREMIUM GLASSMORPHISM — presentation layer only
+   Uses existing section themes; no game logic or saved data changed.
+   Central glass tokens can be tuned here.
+   ───────────────────────────────────────────────────────────── */
+:root{
+  --glass-blur:10px;
+  --glass-radius:20px;
+  --glass-edge:rgba(255,255,255,.105);
+  --glass-highlight:rgba(255,255,255,.045);
+  --glass-shadow:0 14px 34px rgba(0,0,0,.18);
+  --glass-inset:inset 0 1px 0 rgba(255,255,255,.055);
+}
+body[data-theme]{
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse at 88% 0%,color-mix(in srgb,var(--section-accent) 12%,transparent),transparent 38%),
+    radial-gradient(ellipse at 8% 65%,color-mix(in srgb,var(--section-head) 45%,transparent),transparent 44%),
+    linear-gradient(155deg,var(--bg),color-mix(in srgb,var(--bg) 86%,var(--section-head)));
+  background-attachment:scroll;
+}
+body[data-theme] .sidebar,
+body[data-theme] .topbar,
+body[data-theme] .club-mini,
+body[data-theme] .stat-card,
+body[data-theme] .panel,
+body[data-theme] .player-card,
+body[data-theme] .history-tile,
+body[data-theme] .finance-box,
+body[data-theme] .hero,
+body[data-theme] .hero-badge,
+body[data-theme] .match-feature,
+body[data-theme] .fixture-card,
+body[data-theme] .modal,
+body[data-theme] .season-pill,
+body[data-theme] .icon-btn,
+body[data-theme] .mobile-menu{
+  border-color:var(--glass-edge);
+  box-shadow:var(--glass-shadow),var(--glass-inset);
+}
+body[data-theme] .sidebar{
+  background:rgba(8,13,23,.78);
+}
+body[data-theme] .topbar{
+  position:relative;
+  padding:0 0 15px;
+  border-bottom:1px solid var(--glass-edge);
+}
+body[data-theme] .club-mini{
+  background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018)),var(--section-head);
+  border-radius:var(--glass-radius);
+}
+body[data-theme] .stat-card,
+body[data-theme] .panel,
+body[data-theme] .player-card,
+body[data-theme] .history-tile,
+body[data-theme] .finance-box{
+  border:1px solid var(--glass-edge);
+  border-radius:var(--glass-radius);
+  background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012)),var(--panel);
+  box-shadow:0 12px 28px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.045);
+}
+body[data-theme] .panel-head{
+  border-bottom-color:var(--glass-edge);
+}
+body[data-theme] .hero{
+  border-radius:26px;
+  background:linear-gradient(118deg,color-mix(in srgb,var(--section-hero) 88%,transparent),color-mix(in srgb,var(--section-head) 92%,transparent));
+  box-shadow:0 18px 42px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.09);
+}
+body[data-theme] .hero-badge{
+  border-radius:24px;
+  background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.018)),var(--section-soft);
+}
+body[data-theme] .match-feature,
+body[data-theme] .fixture-card{
+  background:linear-gradient(145deg,rgba(255,255,255,.04),rgba(255,255,255,.008)),var(--panel2);
+  border-radius:17px;
+}
+body[data-theme] .fixture-card.next{
+  background:linear-gradient(120deg,color-mix(in srgb,var(--section-accent) 12%,transparent),transparent 72%),var(--section-soft);
+}
+body[data-theme] .nav-item{
+  transition:background-color .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
+}
+body[data-theme] .nav-item:hover,
+body[data-theme] .nav-item.active{
+  background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.018)),var(--section-soft);
+  border-color:var(--glass-edge);
+}
+body[data-theme] .season-pill,
+body[data-theme] .icon-btn,
+body[data-theme] .mobile-menu,
+body[data-theme] .btn-secondary{
+  background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018)),var(--panel2);
+  border:1px solid var(--glass-edge);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+}
+body[data-theme] .btn{
+  transition:transform .14s ease,filter .14s ease,background-color .14s ease,box-shadow .14s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+body[data-theme] .btn-primary{
+  background:linear-gradient(145deg,color-mix(in srgb,var(--section-accent) 88%,white),var(--section-accent));
+  box-shadow:0 7px 18px color-mix(in srgb,var(--section-accent) 17%,transparent),inset 0 1px 0 rgba(255,255,255,.3);
+}
+body[data-theme] .btn-secondary:hover,
+body[data-theme] .icon-btn:hover,
+body[data-theme] .mobile-menu:hover{filter:brightness(1.12)}
+body[data-theme] .btn:active,
+body[data-theme] .icon-btn:active,
+body[data-theme] .mobile-menu:active{transform:scale(.975)}
+body[data-theme] .field,
+body[data-theme] .select{
+  border-radius:12px;
+  background:rgba(5,10,18,.35);
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.12);
+}
+body[data-theme] .field:focus,
+body[data-theme] .select:focus-visible,
+body[data-theme] button:focus-visible{
+  outline:2px solid color-mix(in srgb,var(--section-accent) 70%,transparent);
+  outline-offset:2px;
+}
+body[data-theme] .avatar,
+body[data-theme] .team-crest,
+body[data-theme] .player-face,
+body[data-theme] .attr,
+body[data-theme] .rank{
+  border-color:var(--glass-edge);
+  background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.012)),var(--section-soft);
+}
+body[data-theme] .pill{
+  border:1px solid var(--glass-edge);
+}
+body[data-theme] .modal-backdrop{background:rgba(1,5,12,.68)}
+body[data-theme] .modal{
+  background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.012)),var(--panel);
+  border-radius:24px;
+}
+body[data-theme] .toast{
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 14px 34px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.2);
+}
+body[data-theme] .app-footer{border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  body[data-theme] .sidebar,
+  body[data-theme] .topbar,
+  body[data-theme] .club-mini,
+  body[data-theme] .stat-card,
+  body[data-theme] .panel,
+  body[data-theme] .player-card,
+  body[data-theme] .history-tile,
+  body[data-theme] .finance-box,
+  body[data-theme] .hero,
+  body[data-theme] .hero-badge,
+  body[data-theme] .match-feature,
+  body[data-theme] .fixture-card,
+  body[data-theme] .modal,
+  body[data-theme] .season-pill,
+  body[data-theme] .icon-btn,
+  body[data-theme] .mobile-menu,
+  body[data-theme] .btn-secondary{
+    -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(118%);
+    backdrop-filter:blur(var(--glass-blur)) saturate(118%);
+  }
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  body[data-theme] .stat-card,
+  body[data-theme] .panel,
+  body[data-theme] .player-card,
+  body[data-theme] .history-tile,
+  body[data-theme] .finance-box{background:var(--panel)}
+  body[data-theme] .sidebar{background:var(--section-head)}
+}
+@media(max-width:760px){
+  :root{--glass-blur:8px;--glass-radius:17px}
+  body[data-theme] .sidebar{-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+  body[data-theme] .main-content{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+  body[data-theme] .hero{border-radius:21px}
+  body[data-theme] .stat-card,
+  body[data-theme] .panel,
+  body[data-theme] .player-card,
+  body[data-theme] .history-tile,
+  body[data-theme] .finance-box{box-shadow:0 8px 20px rgba(0,0,0,.13),inset 0 1px 0 rgba(255,255,255,.04)}
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-theme] .btn,
+  body[data-theme] .nav-item{transition:none!important}
+}
