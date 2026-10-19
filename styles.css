@@ -331,3 +331,71 @@
  .facility-metrics b{font-size:12px}
 }
 @media(prefers-reduced-motion:no-preference){.facility-art svg{transition:filter .25s ease,transform .25s ease}.facility-card:active .facility-art svg{filter:saturate(1.08);transform:scale(1.008)}}
+
+/* PROJECT ELEVEN visual refresh · October 2026 */
+:root{--bg:#070d18;--line:rgba(142,177,220,.18);--text:#f4f7fc;--muted:#95a7c2;--blue:#75b4ff;--green:#5de0b1;--gold:#f4c96b}
+body{background:radial-gradient(ellipse at 76% -18%,rgba(36,75,127,.42),transparent 42%),radial-gradient(ellipse at 0% 40%,rgba(28,61,92,.12),transparent 35%),var(--bg)}
+.brand-mark-emblem{width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#7ec2ff,#2b5dca 72%,#16357a);color:#eaf5ff;box-shadow:0 8px 24px rgba(46,111,218,.28),inset 0 1px rgba(255,255,255,.4);padding:4px}
+.brand-mark-emblem svg{width:100%;height:100%;display:block}
+.brand b{letter-spacing:1.05px;font-size:12px}
+.sidebar{background:linear-gradient(180deg,rgba(10,20,37,.98),rgba(7,14,26,.98));border-left-color:rgba(132,170,222,.14)}
+.nav-item{border-radius:12px;transition:background .18s,border-color .18s,color .18s,transform .18s}
+.nav-item:hover{transform:translateX(-2px)}
+.nav-icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:0 0 20px}
+.nav-item.active{background:linear-gradient(100deg,rgba(54,105,173,.28),rgba(24,44,73,.9));border-color:rgba(112,172,255,.2);box-shadow:inset -3px 0 #72b4ff,0 7px 18px rgba(0,0,0,.08)}
+.panel,.stat-card,.hero-card{border-color:rgba(142,177,220,.17);box-shadow:0 12px 34px rgba(0,0,0,.12),inset 0 1px rgba(255,255,255,.025)}
+.panel{background:linear-gradient(145deg,rgba(21,35,57,.96),rgba(11,20,35,.98))}
+.hero-card{background:radial-gradient(ellipse at 88% 20%,rgba(79,145,231,.23),transparent 42%),linear-gradient(115deg,#1d385e,#111e33 68%,#13243c)}
+.btn,.icon-button{transition:transform .16s,border-color .16s,filter .16s}
+.btn:hover,.icon-button:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.live-match-intro{padding:clamp(12px,2vw,22px)}
+.live-match-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.live-match-heading h2{margin:5px 0 8px;font-size:clamp(19px,2.4vw,27px)}
+.live-match-heading p{max-width:740px;line-height:1.8;margin:0}
+.live-status{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid rgba(93,224,177,.25);background:rgba(36,124,94,.12);color:#9df0ce;border-radius:999px;font-size:11px;white-space:nowrap}
+.live-status i{width:7px;height:7px;border-radius:50%;background:#5de0b1;box-shadow:0 0 12px #5de0b1}
+.live-match-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.live-match-notice{margin:12px 0;line-height:1.8}
+.live-match-frame-wrap{overflow:hidden;border:1px solid rgba(136,177,231,.2);border-radius:15px;background:#050a12;box-shadow:0 15px 45px #0004}
+.live-match-frame-wrap iframe{display:block;width:100%;height:clamp(560px,76vh,900px);border:0;background:#070e18}
+.life-hero{display:flex;justify-content:space-between;align-items:center;gap:18px;position:relative;overflow:hidden;padding:clamp(17px,3vw,30px);margin-bottom:15px;border:1px solid rgba(126,179,255,.22);border-radius:18px;background:radial-gradient(ellipse at 88% 35%,rgba(60,127,218,.3),transparent 36%),linear-gradient(120deg,#1a3455,#101c31 70%,#10273b)}
+.life-hero-copy{position:relative;z-index:1}
+.life-hero h2{font-size:clamp(20px,2.7vw,29px);margin:7px 0}
+.life-hero p{max-width:660px;color:#bdcce0;font-size:12px;line-height:1.9;margin:0}
+.life-hero-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:13px}
+.life-hero-tags span{border:1px solid rgba(190,215,248,.2);background:rgba(5,14,28,.32);padding:5px 9px;border-radius:8px;font-size:10px;color:#d7e8ff}
+.life-hero-art{position:relative;flex:0 0 118px;width:118px;height:130px;display:grid;place-items:center;border:1px solid rgba(192,219,255,.2);border-radius:22px;background:linear-gradient(145deg,rgba(120,180,255,.18),rgba(4,12,25,.22));transform:rotate(3deg)}
+.life-hero-art span{font-size:44px;font-weight:900;letter-spacing:-4px;color:#e8f4ff;text-shadow:0 6px 28px #72b4ff66}
+.life-hero-art i{position:absolute;width:70px;height:70px;border:1px solid rgba(93,224,177,.5);border-radius:50%;right:-13px;top:-15px}
+.life-stats{margin-bottom:14px}
+.life-columns{align-items:start}
+.life-meter{margin:15px 0}
+.life-meter>div:first-child{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.life-meter>div:first-child span{color:#b6c5dc}
+.life-meter>div:first-child b{color:#eaf2ff}
+.life-track{height:9px;border-radius:99px;background:#091323;border:1px solid rgba(150,182,225,.12);overflow:hidden;margin-top:8px}
+.life-track i{display:block;height:100%;border-radius:99px;background:var(--meter-color);box-shadow:0 0 14px color-mix(in srgb,var(--meter-color),transparent 65%)}
+.life-activity-list{display:grid;gap:9px}
+.life-activity-card{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px;border:1px solid rgba(142,177,220,.14);border-radius:13px;background:rgba(5,13,25,.35)}
+.life-activity-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(145deg,#243f63,#13243c);font-size:20px}
+.life-activity-copy{min-width:0}
+.life-activity-copy b{font-size:12px}
+.life-activity-copy p{font-size:10px;line-height:1.65;color:var(--muted);margin:3px 0}
+.life-activity-copy small{font-size:9px;color:#9bb8d9}
+.life-activity-card .btn{white-space:nowrap}
+.life-history{margin-top:14px}
+@media(max-width:700px){
+ .live-match-heading{display:block}
+ .live-status{margin-top:12px}
+ .live-match-frame-wrap iframe{height:70vh;min-height:570px}
+ .life-hero{align-items:flex-start}
+ .life-hero-art{flex-basis:72px;width:72px;height:86px;border-radius:15px}
+ .life-hero-art span{font-size:29px}
+ .life-hero-art i{width:43px;height:43px;right:-8px;top:-8px}
+ .life-activity-card{grid-template-columns:34px minmax(0,1fr);gap:8px;padding:9px}
+ .life-activity-icon{width:34px;height:34px;font-size:17px}
+ .life-activity-card .btn{grid-column:2;justify-self:start;padding:6px 11px}
+ #main-nav .nav-item:not([data-view="dashboard"]):not([data-view="tactics"]):not([data-view="liveMatch"]):not([data-view="life"]):not([data-view="room"]){display:none}
+ #main-nav{justify-content:space-around;overflow:visible}
+ #main-nav .nav-item{flex:1 1 20%;max-width:20%;min-width:0}
+}
