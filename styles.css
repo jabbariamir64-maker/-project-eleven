@@ -43,3 +43,28 @@
 .dm-input{width:100%;margin:10px 0;resize:vertical}
 @media(max-width:900px){.social-club-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.news-layout{grid-template-columns:1fr}}
 @media(max-width:600px){.social-head{align-items:flex-start;flex-direction:column}.social-head h2{font-size:19px}.social-club-grid{grid-template-columns:1fr}.profile-cover{padding:14px;gap:12px}.profile-crest{width:58px;height:58px;font-size:30px}.profile-main h2{font-size:19px}.social-counts{gap:15px}.social-club-card .btn-row{gap:6px}.social-club-card .btn{padding:8px}}
+
+/* PES-inspired tactics screen refinements */
+.tactics-topline{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin:4px 0 14px}
+.tactics-topline h2{margin:4px 0 6px;font-size:22px}
+.tactics-topline .muted{max-width:720px;line-height:1.8}
+.tactics-layout{grid-template-columns:minmax(0,1.35fr) minmax(270px,.8fr)}
+.pitch-panel{background:linear-gradient(180deg,#101c2e,#0c1524)}
+.pitch-toolbar{flex-wrap:wrap}
+.football-pitch{box-shadow:inset 0 0 0 5px rgba(255,255,255,.035),0 12px 30px rgba(0,0,0,.18)}
+.pitch-player{width:76px;padding:4px 2px 5px;border-radius:9px;transition:filter .12s,background .12s}
+.pitch-player:hover,.pitch-player:focus-visible{background:rgba(6,19,35,.35);outline:1px solid rgba(255,255,255,.55)}
+.pitch-shirt{width:34px;height:34px;font-size:11px;filter:drop-shadow(0 3px 3px #06351f);background:linear-gradient(145deg,#d8eaff,#2f79d2);color:#fff;border:1px solid rgba(255,255,255,.9)}
+.pitch-player b{font-size:10px;line-height:1.25;max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(4,17,29,.58);border-radius:4px;padding:2px 4px}
+.pitch-player small{font-size:9px;font-weight:800;letter-spacing:.3px;color:#e7f2ff;background:rgba(4,17,29,.45);border-radius:3px;padding:1px 4px}
+.pitch-empty{opacity:.7}
+.pitch-empty .pitch-shirt{background:rgba(7,29,21,.72);border:1px dashed #d7f1dd}
+.bench-head{margin-top:16px;padding-top:13px;border-top:1px solid rgba(255,255,255,.1)}
+.bench-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.bench-player{min-width:0;transition:border-color .15s,background .15s}
+.bench-player.is-selected{border-color:var(--blue);background:#193454;box-shadow:0 0 0 2px rgba(109,168,255,.15)}
+.tactics-settings{gap:12px}
+.tactics-settings .field-label{line-height:1.5}
+.tactics-save{position:sticky;bottom:8px;z-index:3;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+@media(max-width:850px){.tactics-layout{grid-template-columns:minmax(0,1fr)}.tactics-topline h2{font-size:19px}.football-pitch{max-height:none}.bench-list{grid-template-columns:minmax(0,1fr)}.tactics-save{position:static}}
+@media(max-width:420px){.pitch-player{width:63px}.pitch-shirt{width:29px;height:29px}.pitch-player b{font-size:9px;max-width:61px}.pitch-player small{font-size:8px}.pitch-toolbar{align-items:flex-start}.compact-label{min-width:100px}}
