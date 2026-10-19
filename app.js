@@ -179,9 +179,10 @@
   function sellPlayer(id){
     const p=playerById(id),c=userClub();if(!p||p.clubId!==c.id)return;
     if(squad(c.id).length<=11){toast("حداقل ۱۱ بازیکن باید در فهرست باقی بمانند");return;}
-    const offers=state.clubs.filter(x=>x.id!==c.id&&squad(x.id).length<x.capacity);
-    if(!offers.length){toast("هیچ باشگاه دیگری ظرفیت خالی ندارد");return;}
-    const target=offers.sort((a,b)=>a.budget-b.budget).pop();const fee=Math.round(p.value*rand(85,115)/100);
+    const fee=Math.round(p.value*rand(85,115)/100);
+    const offers=state.clubs.filter(x=>x.id!==c.id&&squad(x.id).length<x.capacity&&x.budget>=fee);
+    if(!offers.length){toast("هیچ باشگاه دارای بودجه و ظرفیت کافی برای خرید این بازیکن نیست");return;}
+    const target=offers.sort((a,b)=>a.budget-b.budget).pop();
     confirmAction("فروش بازیکن","بازیکن "+escapeHtml(p.name)+" به "+escapeHtml(target.name)+" فروخته می‌شود. مبلغ انتقال "+money(fee)+" است. ادامه می‌دهی؟","confirm-sell-"+p.id,"تأیید فروش");
     state.pendingSell={playerId:p.id,targetId:target.id,fee};
   }
