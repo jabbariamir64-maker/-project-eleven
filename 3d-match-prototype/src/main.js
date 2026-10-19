@@ -51,7 +51,7 @@
   homeFormation.forEach((p,i)=>makePlayer(0,i,p[0],p[1]));awayFormation.forEach((p,i)=>makePlayer(1,i,p[0],p[1]));
   const ball=BABYLON.MeshBuilder.CreateSphere("match-ball",{diameter:.72,segments:20},scene);ball.position.set(-7,.4,-9);ball.material=ballMat;
   const seam=BABYLON.MeshBuilder.CreateLines("ball-seam",{points:[new BABYLON.Vector3(-.28,.05,0),new BABYLON.Vector3(0,.05,.25),new BABYLON.Vector3(.28,.05,0),new BABYLON.Vector3(0,.05,-.25),new BABYLON.Vector3(-.28,.05,0)]},scene);seam.color=BABYLON.Color3.FromHexString("#1a2632");seam.parent=ball;seam.position.y=.05;
-  let running=false, gameSeconds=0, homeScore=0, awayScore=0, owner=players[9], ballVelocity=new BABYLON.Vector3(0,0,0), actionIn=100, halftime=false, matchEnded=false, lastClockMinute=-1;
+  let running=false, gameSeconds=0, homeScore=0, awayScore=0, owner=players[9], ballVelocity=new BABYLON.Vector3(0,0,0), actionIn=100, halftime=false, matchEnded=false, lastClockMinute=-1, tacticalView=false, simulationSpeed=1;
   function log(message){const li=document.createElement("li");li.textContent=message;logEl.prepend(li);while(logEl.children.length>7)logEl.removeChild(logEl.lastChild);}
   function clock(){const minute=Math.min(90,Math.floor(gameSeconds/60));return String(minute).padStart(2,"0")+":"+String(Math.floor(gameSeconds%60)).padStart(2,"0");}
   function ui(){homeScoreEl.textContent=homeScore;awayScoreEl.textContent=awayScore;timeEl.textContent=clock();phaseEl.textContent=matchEnded?"پایان مسابقه":halftime?"پایان نیمه اول":running?"مسابقه در جریان":"آماده شروع";$("startBtn").textContent=halftime?"▶ شروع نیمه دوم":matchEnded?"✓ مسابقه تمام شد":"▶ شروع مسابقه";}
@@ -95,6 +95,7 @@
   function goal(team){if(team===0)homeScore++;else awayScore++;log("⚽ گل برای "+(team===0?homeLabel:awayLabel)+"!");restartAfterGoal();ui();}
   function update(dt){
     if(!running)return;
+    dt*=simulationSpeed;
     gameSeconds+=dt*45; // 45 match minutes pass in 60 real seconds.
     if(gameSeconds>=2700&&!halftime){gameSeconds=2700;running=false;halftime=true;log("⏸ پایان نیمه اول؛ برای شروع نیمه دوم دکمه را بزن.");ui();return;}
     if(gameSeconds>=5400){gameSeconds=5400;running=false;matchEnded=true;log("🏁 پایان مسابقه.");ui();return;}
@@ -130,9 +131,12 @@
   $("startBtn").addEventListener("click",()=>{if(matchEnded){reset();}if(halftime){halftime=false;running=true;log("▶ نیمه دوم شروع شد.");}else{running=true;log("مسابقه شروع شد؛ تصمیم‌های بازیکن‌ها بر اساس ویژگی‌هایشان محاسبه می‌شود.");}ui();});
   $("pauseBtn").addEventListener("click",()=>{running=false;log("مسابقه متوقف شد.");ui();});
   $("resetBtn").addEventListener("click",reset);
+  $("cameraBtn").addEventListener("click",()=>{tacticalView=!tacticalView;camera.beta=tacticalView?.16:1.08;camera.radius=tacticalView?112:102;camera.lowerBetaLimit=tacticalView?.12:.72;camera.upperBetaLimit=tacticalView?.35:1.35;$("cameraBtn").textContent=tacticalView?"🎥 نمای تلویزیونی":"🎥 نمای تاکتیکی";log(tacticalView?"نمای تاکتیکی از بالا فعال شد.":"نمای تلویزیونی فعال شد.");});
+  $("speedBtn").addEventListener("click",()=>{simulationSpeed=simulationSpeed===1?2:simulationSpeed===2?.5:1;$("speedBtn").textContent="⏩ سرعت "+(simulationSpeed===.5?"۰٫۵×":simulationSpeed+"×");log("سرعت شبیه‌سازی تغییر کرد.");});
   $("passBtn").addEventListener("click",()=>{if(!running&&!halftime&&!matchEnded)running=true;if(!owner)owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);chooseAction("pass");ui();});
   $("shootBtn").addEventListener("click",()=>{if(!running&&!halftime&&!matchEnded)running=true;if(!owner)owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);chooseAction("shot");ui();});
   scene.onBeforeRenderObservable.add(()=>update(Math.min(engine.getDeltaTime()/1000,.05)));
   engine.runRenderLoop(()=>scene.render());window.addEventListener("resize",()=>engine.resize());
+  canvas.addEventListener("dblclick",()=>{tacticalView=!tacticalView;camera.beta=tacticalView?.16:1.08;camera.radius=tacticalView?112:102;camera.lowerBetaLimit=tacticalView?.12:.72;camera.upperBetaLimit=tacticalView?.35:1.35;$("cameraBtn").textContent=tacticalView?"🎥 نمای تلویزیونی":"🎥 نمای تاکتیکی";});
   scene.executeWhenReady(()=>loading.classList.add("hidden"));reset();if(replayMode){running=true;log("▶ بازپخش خودکار شروع شد؛ نتیجه نهایی با گزارش مسابقه هماهنگ است.");ui();}
 })();
