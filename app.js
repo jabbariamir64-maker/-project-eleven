@@ -63,7 +63,7 @@
   }
   function toast(message) { const el=document.createElement("div");el.className="toast";el.textContent=message;$("#toast-region").appendChild(el);setTimeout(()=>el.remove(),3300); }
   function addLog(message){state.logs.unshift({text:message,week:state.week,season:state.season});state.logs=state.logs.slice(0,40);}
-  const VIEW_THEMES={dashboard:"club",squad:"team",market:"transfers",tactics:"training",fixtures:"league",finance:"profile",history:"cup",champions:"champions",playerMarket:"player-market",messages:"messages",groups:"groups",store:"store"};
+  const VIEW_THEMES={dashboard:"club",squad:"team",market:"transfers",tactics:"training",fixtures:"league",finance:"store",history:"champions",champions:"champions",playerMarket:"player-market",messages:"messages",groups:"groups",store:"store"};
   function applyViewTheme(view){document.body.dataset.theme=VIEW_THEMES[view]||"club";}
   function changeView(view) {currentView=view;applyViewTheme(view); $(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view)); render(); const side=$(".sidebar");if(side)side.classList.remove("open");}
   const titles={dashboard:"داشبورد باشگاه",squad:"ترکیب تیم",market:"بازار نقل‌وانتقالات",tactics:"تاکتیک و تمرین",fixtures:"مسابقات و جدول",finance:"اقتصاد باشگاه",history:"آمار و افتخارات"};
