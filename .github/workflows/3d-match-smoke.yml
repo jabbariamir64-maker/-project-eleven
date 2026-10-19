@@ -1,12 +1,13 @@
 name: 3D Match Browser Smoke Test
 on:
   push:
-    branches: [ai/babylon-match-sim]
+    branches: [ai/babylon-match-sim, main]
     paths:
       - '3d-match-prototype/**'
       - '.github/workflows/3d-match-smoke.yml'
       - 'tests/3d-match-smoke.cjs'
       - 'tests/3d-match-long.cjs'
+      - 'tests/game-integration-smoke.cjs'
   workflow_dispatch:
 permissions:
   contents: read
@@ -31,3 +32,5 @@ jobs:
         run: node tests/3d-match-smoke.cjs
       - name: Run extended full-match test
         run: node tests/3d-match-long.cjs
+      - name: Run main game integration test
+        run: node tests/game-integration-smoke.cjs
