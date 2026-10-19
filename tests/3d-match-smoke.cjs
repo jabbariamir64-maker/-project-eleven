@@ -1,0 +1,38 @@
+const { chromium } = require('playwright');
+const assert = require('node:assert/strict');
+
+(async () => {
+  const browser = await chromium.launch({ headless: true, args: ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'] });
+  const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+  await page.goto('http://127.0.0.1:4173/3d-match-prototype/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForFunction(() => !!window.BABYLON, { timeout: 30000 });
+  await page.waitForFunction(() => document.querySelector('#loading')?.classList.contains('hidden'), { timeout: 30000 });
+  assert.equal(await page.title(), 'PROJECT ELEVEN — 3D Match Prototype');
+  assert.ok(await page.locator('#gameCanvas').isVisible(), '3D canvas should be visible');
+  assert.ok(await page.locator('#miniMap').isVisible(), 'live tactical radar should be visible');
+  await page.locator('#formationSelect').selectOption('433');
+  assert.match(await page.locator('#tacticsStatus').innerText(), /۴-۳-۳/);
+  await page.locator('#strategySelect').selectOption('press');
+  assert.match(await page.locator('#tacticsStatus').innerText(), /پرس از جلو/);
+  await page.locator('#startBtn').click();
+  await page.waitForTimeout(1400);
+  const clockAfterStart = await page.locator('#matchTime').innerText();
+  assert.notEqual(clockAfterStart, '00:00', 'match clock should advance after start');
+  await page.locator('#pauseBtn').click();
+  const pausedClock = await page.locator('#matchTime').innerText();
+  await page.waitForTimeout(700);
+  assert.equal(await page.locator('#matchTime').innerText(), pausedClock, 'match clock should stop when paused');
+  await page.locator('#passBtn').click();
+  assert.ok(Number(await page.locator('#homePasses').innerText()) + Number(await page.locator('#awayPasses').innerText()) >= 1, 'pass control should update pass statistics');
+  await page.locator('#shootBtn').click();
+  assert.ok(Number(await page.locator('#homeShots').innerText()) + Number(await page.locator('#awayShots').innerText()) >= 1, 'shot control should update shot statistics');
+  await page.locator('#resetBtn').click();
+  assert.equal(await page.locator('#homeScore').innerText(), '0');
+  assert.equal(await page.locator('#awayScore').innerText(), '0');
+  assert.equal(await page.locator('#matchTime').innerText(), '00:00');
+  assert.deepEqual(pageErrors, [], 'no uncaught page errors');
+  console.log(JSON.stringify({ result: 'PASS', checks: ['Babylon loads and scene initializes','canvas and radar visible','formation selector','strategy selector','clock advances','pause freezes clock','pass updates stats','shot updates stats','reset clears match','no uncaught page errors'], pageErrors }, null, 2));
+  await browser.close();
+})().catch(error => { console.error(error); process.exit(1); });
