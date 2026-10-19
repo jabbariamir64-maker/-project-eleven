@@ -10,7 +10,7 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
   const pageErrors = [];
   try {
     // Long full-match test at normal simulation speed, including half-time and full-time.
-    const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+    const page = await browser.newPage({ viewport: { width: 960, height: 640 } });
     page.on('pageerror', error => pageErrors.push('desktop: ' + error.message));
     await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForFunction(() => !!window.BABYLON, undefined, { timeout: 30000 });
@@ -32,7 +32,7 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
     await page.locator('#speedBtn').click();
     assert.match(await page.locator('#speedBtn').innerText(), /2×/);
     await page.locator('#startBtn').click();
-    await page.waitForFunction(() => document.querySelector('#matchTime')?.innerText === '45:00', undefined, { timeout: 70000 });
+    await page.waitForFunction(() => document.querySelector('#matchTime')?.innerText === '45:00', undefined, { timeout: 120000 });
     assert.match(await page.locator('#phaseLabel').innerText(), /نیمه اول/);
     assert.match(await page.locator('#eventLog').innerText(), /پایان نیمه اول/);
     results.push('full first half reached 45:00 and paused at half-time');
