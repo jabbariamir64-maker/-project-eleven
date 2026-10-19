@@ -235,7 +235,7 @@ function liveMatchView(){
   params.set("homeColor",color(h?.kitPrimary,"#168cff"));params.set("awayColor",color(a?.kitPrimary,"#28d99b"));
   const formationKey=state.formation==="4-3-3"?"433":state.formation==="3-5-2"?"352":"442";
   const mentality=state.mentality||"balanced",tactics=state.tactics||{};
-  const strategyKey=mentality==="defensive"?"defensive":mentality==="attacking"?"attack":tactics.style==="press"||Number(tactics.pressing)>75?"press":"balanced";
+  const strategyKey=mentality==="defensive"?"defensive":tactics.style==="press"||Number(tactics.pressing)>75?"press":mentality==="attacking"||["counter","wing","direct"].includes(tactics.style)?"attack":"balanced";
   params.set("formation",formationKey);params.set("strategy",strategyKey);
  }
  if(selected.played){params.set("hg",String(selected.homeGoals||0));params.set("ag",String(selected.awayGoals||0));params.set("goals",goals.map(x=>x.minute+":"+x.team).join(","))}
