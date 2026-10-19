@@ -2,6 +2,7 @@
   "use strict";
   const $ = id => document.getElementById(id);
   const canvas=$("gameCanvas"), loading=$("loading"), homeScoreEl=$("homeScore"), awayScoreEl=$("awayScore"), timeEl=$("matchTime"), phaseEl=$("phaseLabel"), logEl=$("eventLog");
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const matchParams=new URLSearchParams(window.location.search);
   if(matchParams.get("home"))$("homeTeamName").textContent=matchParams.get("home");
   if(matchParams.get("away"))$("awayTeamName").textContent=matchParams.get("away");
@@ -32,7 +33,7 @@
   }
   for(const side of [-1,1]){const stand=BABYLON.MeshBuilder.CreateBox("stand",{width:112,height:5,depth:7},scene);stand.position.set(0,1.8,side*39);stand.material=standMat;for(let r=0;r<3;r++){const row=BABYLON.MeshBuilder.CreateBox("seat-row",{width:108,height:.16,depth:.4},scene);row.position.set(0,.4+r*.65,side*(36.5+r*1.6));row.material=seatMat;}}
   const players=[];
-  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), rand=(a,b)=>a+Math.random()*(b-a), dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
+  const rand=(a,b)=>a+Math.random()*(b-a), dist=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
   function makePlayer(team,idx,x,z){
     const root=new BABYLON.TransformNode("player-"+team+"-"+idx,scene);
     const body=BABYLON.MeshBuilder.CreateCapsule("body",{height:1.55,radius:.34,tessellation:8,subdivisions:2},scene);body.parent=root;body.position.y=.94;body.material=team===0?blueMat:greenMat;
@@ -90,7 +91,7 @@
     if(nearest&&dist(owner.root.position,nearest.root.position)<2.1&&Math.random()>(skill*.72)){owner=null;ballVelocity.set(-dir*rand(2,7),0,rand(-4,4));log("مدافع توپ را از بازیکن گرفت.");}
     else{ballVelocity.set(0,0,0);actionIn=rand(80,140);log(skill>.78?"دریبل موفق و حرکت رو به جلو.":"بازیکن توپ را جلو می‌برد.");}
   }
-  function restartAfterGoal(){ballVelocity.set(0,0,0);owner=players.find(p=>p.team===(homeScore+awayScore)%2?0:1)||players[9];players.forEach(p=>{p.root.position.copyFrom(p.home);p.target.copyFrom(p.home);});owner=players[(homeScore+awayScore)%2===0?9:20];ball.position.set(owner.root.position.x,.4,owner.root.position.z);actionIn=110;}
+  function restartAfterGoal(){ballVelocity.set(0,0,0);players.forEach(p=>{p.root.position.copyFrom(p.home);p.target.copyFrom(p.home);});owner=players[(homeScore+awayScore)%2===0?9:20];ball.position.set(owner.root.position.x,.4,owner.root.position.z);actionIn=110;}
   function goal(team){if(team===0)homeScore++;else awayScore++;log("⚽ گل برای "+(team===0?homeLabel:awayLabel)+"!");restartAfterGoal();ui();}
   function update(dt){
     if(!running)return;
