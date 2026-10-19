@@ -227,3 +227,10 @@
 #main-nav .nav-item{flex:1 1 20%;max-width:20%;min-width:0}
 .room-grid{grid-template-columns:1fr}
 }
+
+.mission-card{display:flex;flex-direction:column;gap:10px}
+.mission-card .panel-head{align-items:center}
+.mission-card .btn{margin-top:5px;width:100%}
+.mission-progress{height:7px;border-radius:20px;background:#27364a;overflow:hidden;margin-top:4px}
+.mission-progress span{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#39d98a,#d9b45b);transition:width .25s ease}
+.mission-card .pill{color:#e5c878;border-color:#d9b45b40;background:#d9b45b12}
