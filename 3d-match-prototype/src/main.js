@@ -72,6 +72,15 @@
   const radarBall=miniMap.querySelector(".mini-ball");
   function updateRadar(){for(const item of radarDots){item.dot.style.left=((item.p.root.position.x+55)/110*100)+"%";item.dot.style.top=((item.p.root.position.z+34)/68*100)+"%";}radarBall.style.left=((ball.position.x+55)/110*100)+"%";radarBall.style.top=((ball.position.z+34)/68*100)+"%";}
   let running=false, gameSeconds=0, homeScore=0, awayScore=0, owner=players[9], ballVelocity=new BABYLON.Vector3(0,0,0), ballVelocityY=0, actionIn=100, halftime=false, secondHalfStarted=false, matchEnded=false, lastClockMinute=-1, tacticalView=false, simulationSpeed=1;
+  let currentFormation="442", teamStrategy="balanced";
+  const formations={
+    "442":[[-49,0],[-35,-22],[-37,-8],[-37,8],[-35,22],[-17,-22],[-19,-7],[-19,7],[-17,22],[7,-10],[7,10]],
+    "433":[[-49,0],[-35,-22],[-37,-8],[-37,8],[-35,22],[-17,-17],[-20,0],[-17,17],[8,-23],[10,0],[8,23]],
+    "352":[[-49,0],[-35,-18],[-38,0],[-35,18],[-17,-27],[-19,-14],[-20,0],[-19,14],[-17,27],[7,-10],[7,10]]
+  };
+  function applyFormation(key,announce=true){currentFormation=key;const shape=formations[key]||formations["442"];players.forEach(p=>{const pos=shape[p.idx];const x=p.team===0?pos[0]:-pos[0];p.home.set(x,0,pos[1]);p.target.copyFrom(p.home);});if(announce)log("آرایش جدید برای هر دو تیم اعمال شد: "+({"442":"۴-۴-۲","433":"۴-۳-۳","352":"۳-۵-۲"}[key]||key)+".");const status=$("tacticsStatus");if(status)status.textContent="آرایش: "+({"442":"۴-۴-۲","433":"۴-۳-۳","352":"۳-۵-۲"}[key]||key)+" · سبک: "+({"balanced":"متعادل","press":"پرس از جلو","defensive":"دفاعی","attack":"هجومی"}[teamStrategy]||teamStrategy);}
+  function updateStrategy(key){teamStrategy=key;const status=$("tacticsStatus");if(status)status.textContent="آرایش: "+({"442":"۴-۴-۲","433":"۴-۳-۳","352":"۳-۵-۲"}[currentFormation]||currentFormation)+" · سبک: "+({"balanced":"متعادل","press":"پرس از جلو","defensive":"دفاعی","attack":"هجومی"}[teamStrategy]||teamStrategy);log("سبک بازی تغییر کرد: "+({"balanced":"متعادل","press":"پرس از جلو","defensive":"دفاعی","attack":"هجومی"}[key]||key)+".");}
+
   function log(message){const li=document.createElement("li");li.textContent=message;logEl.prepend(li);while(logEl.children.length>7)logEl.removeChild(logEl.lastChild);}
   function clock(){const minute=Math.min(90,Math.floor(gameSeconds/60));return String(minute).padStart(2,"0")+":"+String(Math.floor(gameSeconds%60)).padStart(2,"0");}
   function ui(){homeScoreEl.textContent=homeScore;awayScoreEl.textContent=awayScore;timeEl.textContent=clock();phaseEl.textContent=matchEnded?"پایان مسابقه":halftime?"پایان نیمه اول":running?"مسابقه در جریان":"آماده شروع";$("startBtn").textContent=halftime?"▶ شروع نیمه دوم":matchEnded?"✓ مسابقه تمام شد":"▶ شروع مسابقه";}
@@ -84,9 +93,10 @@
     const team=owner.team, dir=team===0?1:-1, goalX=dir*52.5, progress=owner.root.position.x*dir;
     const nearest=nearestOpponent(owner), pressure=nearest?Math.max(0,1-dist(owner.root.position,nearest.root.position)/8):0;
     const goalDistance=Math.abs(goalX-owner.root.position.x), shootingLane=Math.abs(owner.root.position.z)<15;
-    const shotChance=clamp(.04+(progress>22?.12:0)+(progress>34?.18:0)+(shootingLane?.1:0)+(owner.shooting-70)/250, .02,.62);
+    const strategyShot=team===0?(teamStrategy==="attack"?.12:teamStrategy==="defensive"?-.08:0):0;
+    const shotChance=clamp(.04+(progress>22?.12:0)+(progress>34?.18:0)+(shootingLane?.1:0)+(owner.shooting-70)/250+strategyShot, .02,.62);
     let action=manual;
-    if(!action){if(goalDistance<24&&shootingLane&&Math.random()<shotChance)action="shot";else if(pressure>.65&&Math.random()<.56)action="pass";else if(Math.random()<.22+owner.technique/280)action="dribble";else action="pass";}
+    if(!action){if(goalDistance<24&&shootingLane&&Math.random()<shotChance)action="shot";else if(pressure>(team===0&&teamStrategy==="press"?.48:.65)&&Math.random()<(team===0&&teamStrategy==="attack"?.4:.56))action="pass";else if(Math.random()<.22+owner.technique/280)action="dribble";else action="pass";}
     if(action==="shot"){
       const quality=owner.shooting/100, technique=owner.technique/100, power=clamp(.58+quality*.38+rand(-.12,.1),.45,1);
       const accuracy=clamp((.24+quality*.48+technique*.18)*(1-pressure*.48),.12,.9);
@@ -148,7 +158,7 @@
       }
       else p.target.copyFrom(p.home);
       const dx=p.target.x-p.root.position.x,dz=p.target.z-p.root.position.z,d=Math.hypot(dx,dz),pace=(p.pace/75)*(p.stamina/100);
-      const fatigue=clamp(p.stamina/100,.55,1), sprinting=!!(owner&&dist(p.root.position,owner.root.position)<8);const step=Math.min(d,dt*(sprinting?6.2:4.1)*pace*fatigue);
+      const fatigue=clamp(p.stamina/100,.55,1), sprinting=!!(owner&&dist(p.root.position,owner.root.position)<8);const strategyBoost=p.team===0?(teamStrategy==="press"&&sprinting?1.12:teamStrategy==="attack"&&isAttacking?1.1:teamStrategy==="defensive"&&!isAttacking?1.12:1):1;const step=Math.min(d,dt*(sprinting?6.2:4.1)*pace*fatigue*strategyBoost);
       if(d>.01){p.root.position.x+=dx/d*step;p.root.position.z+=dz/d*step;p.root.rotation.y=Math.atan2(dx,dz);}
       p.phase+=dt*(sprinting?8:5+p.pace/18);p.root.position.y=Math.abs(Math.sin(p.phase))*(d>.12?.055:.018);
       const stride=d>.12?Math.sin(p.phase)*.58:Math.sin(p.phase*.45)*.035;
@@ -162,6 +172,8 @@
   $("startBtn").addEventListener("click",()=>{if(matchEnded){reset();}if(halftime){halftime=false;secondHalfStarted=true;running=true;log("▶ نیمه دوم شروع شد.");}else{running=true;log("مسابقه شروع شد؛ تصمیم‌های بازیکن‌ها بر اساس ویژگی‌هایشان محاسبه می‌شود.");}ui();});
   $("pauseBtn").addEventListener("click",()=>{running=false;log("مسابقه متوقف شد.");ui();});
   $("resetBtn").addEventListener("click",reset);
+  $("formationSelect").addEventListener("change",e=>applyFormation(e.target.value));
+  $("strategySelect").addEventListener("change",e=>updateStrategy(e.target.value));
   $("cameraBtn").addEventListener("click",()=>{tacticalView=!tacticalView;camera.beta=tacticalView?.16:1.08;camera.radius=tacticalView?112:102;camera.lowerBetaLimit=tacticalView?.12:.72;camera.upperBetaLimit=tacticalView?.35:1.35;$("cameraBtn").textContent=tacticalView?"🎥 نمای تلویزیونی":"🎥 نمای تاکتیکی";log(tacticalView?"نمای تاکتیکی از بالا فعال شد.":"نمای تلویزیونی فعال شد.");});
   $("speedBtn").addEventListener("click",()=>{simulationSpeed=simulationSpeed===1?2:simulationSpeed===2?.5:1;$("speedBtn").textContent="⏩ سرعت "+(simulationSpeed===.5?"۰٫۵×":simulationSpeed+"×");log("سرعت شبیه‌سازی تغییر کرد.");});
   $("passBtn").addEventListener("click",()=>{if(!running&&!halftime&&!matchEnded)running=true;if(!owner)owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);chooseAction("pass");ui();});
@@ -169,5 +181,5 @@
   scene.onBeforeRenderObservable.add(()=>update(Math.min(engine.getDeltaTime()/1000,.05)));
   engine.runRenderLoop(()=>scene.render());window.addEventListener("resize",()=>engine.resize());
   canvas.addEventListener("dblclick",()=>{tacticalView=!tacticalView;camera.beta=tacticalView?.16:1.08;camera.radius=tacticalView?112:102;camera.lowerBetaLimit=tacticalView?.12:.72;camera.upperBetaLimit=tacticalView?.35:1.35;$("cameraBtn").textContent=tacticalView?"🎥 نمای تلویزیونی":"🎥 نمای تاکتیکی";});
-  scene.executeWhenReady(()=>loading.classList.add("hidden"));reset();updateRadar();if(replayMode){running=true;log("▶ بازپخش خودکار شروع شد؛ نتیجه نهایی با گزارش مسابقه هماهنگ است.");ui();}
+  scene.executeWhenReady(()=>loading.classList.add("hidden"));applyFormation("442",false);reset();updateRadar();if(replayMode){running=true;log("▶ بازپخش خودکار شروع شد؛ نتیجه نهایی با گزارش مسابقه هماهنگ است.");ui();}
 })();
