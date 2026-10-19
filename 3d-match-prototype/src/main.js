@@ -2,6 +2,9 @@
   "use strict";
   const $ = id => document.getElementById(id);
   const canvas=$("gameCanvas"), loading=$("loading"), homeScoreEl=$("homeScore"), awayScoreEl=$("awayScore"), timeEl=$("matchTime"), phaseEl=$("phaseLabel"), logEl=$("eventLog");
+  const matchParams=new URLSearchParams(window.location.search);
+  if(matchParams.get("home"))$("homeTeamName").textContent=matchParams.get("home");
+  if(matchParams.get("away"))$("awayTeamName").textContent=matchParams.get("away");
   const engine=new BABYLON.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,adaptToDeviceRatio:true});
   const scene=new BABYLON.Scene(engine); scene.clearColor=new BABYLON.Color4(.025,.055,.085,1);
   const camera=new BABYLON.ArcRotateCamera("broadcast-camera",-Math.PI/2,1.08,102,new BABYLON.Vector3(0,0,0),scene);
