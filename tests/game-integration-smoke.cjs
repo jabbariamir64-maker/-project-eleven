@@ -52,6 +52,8 @@ const assert = require('node:assert/strict');
     // Run a real 90-minute match inside the main game's iframe. The child frame must
     // post its own final score/stats; the parent must persist them and finish the round.
     const matchFrame = page.frameLocator('#view-root iframe');
+    // Keep the embedded canvas in the viewport so Chromium does not throttle its animation loop.
+    await matchFrame.locator('#gameCanvas').scrollIntoViewIfNeeded();
     await matchFrame.locator('#speedBtn').click();
     assert.match(await matchFrame.locator('#speedBtn').innerText(), /2×/, 'match speed can be set to 2x');
     await matchFrame.locator('#startBtn').click();
