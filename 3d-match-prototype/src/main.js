@@ -5,6 +5,11 @@
   const matchParams=new URLSearchParams(window.location.search);
   if(matchParams.get("home"))$("homeTeamName").textContent=matchParams.get("home");
   if(matchParams.get("away"))$("awayTeamName").textContent=matchParams.get("away");
+  const replayMode=matchParams.has("hg")&&matchParams.has("ag");
+  const replayTargetHome=Math.max(0,Number(matchParams.get("hg"))||0),replayTargetAway=Math.max(0,Number(matchParams.get("ag"))||0);
+  const replayGoals=(matchParams.get("goals")||"").split(",").filter(Boolean).map(v=>{const q=v.split(":");return {minute:clamp(Number(q[0])||1,1,89),team:Number(q[1])===1?1:0,done:false}}).sort((a,b)=>a.minute-b.minute);
+  const homeLabel=matchParams.get("home")||"آبی‌ها",awayLabel=matchParams.get("away")||"سبزها";
+  let replayGoalPending=null;
   const engine=new BABYLON.Engine(canvas,true,{preserveDrawingBuffer:false,stencil:true,adaptToDeviceRatio:true});
   const scene=new BABYLON.Scene(engine); scene.clearColor=new BABYLON.Color4(.025,.055,.085,1);
   const camera=new BABYLON.ArcRotateCamera("broadcast-camera",-Math.PI/2,1.08,102,new BABYLON.Vector3(0,0,0),scene);
@@ -84,20 +89,21 @@
     else{ballVelocity.set(0,0,0);actionIn=rand(80,140);log(skill>.78?"دریبل موفق و حرکت رو به جلو.":"بازیکن توپ را جلو می‌برد.");}
   }
   function restartAfterGoal(){ballVelocity.set(0,0,0);owner=players.find(p=>p.team===(homeScore+awayScore)%2?0:1)||players[9];players.forEach(p=>{p.root.position.copyFrom(p.home);p.target.copyFrom(p.home);});owner=players[(homeScore+awayScore)%2===0?9:20];ball.position.set(owner.root.position.x,.4,owner.root.position.z);actionIn=110;}
-  function goal(team){if(team===0)homeScore++;else awayScore++;log("⚽ گل برای "+(team===0?"آبی‌ها":"سبزها")+"!");restartAfterGoal();ui();}
+  function goal(team){if(team===0)homeScore++;else awayScore++;log("⚽ گل برای "+(team===0?homeLabel:awayLabel)+"!");restartAfterGoal();ui();}
   function update(dt){
     if(!running)return;
     gameSeconds+=dt*45; // 45 match minutes pass in 60 real seconds.
     if(gameSeconds>=2700&&!halftime){gameSeconds=2700;running=false;halftime=true;log("⏸ پایان نیمه اول؛ برای شروع نیمه دوم دکمه را بزن.");ui();return;}
     if(gameSeconds>=5400){gameSeconds=5400;running=false;matchEnded=true;log("🏁 پایان مسابقه.");ui();return;}
+    if(replayMode){if(replayGoalPending){replayGoalPending.remaining-=dt;if(replayGoalPending.remaining<=0){const scoredTeam=replayGoalPending.team;goal(scoredTeam);log("بازپخش · گل ثبت‌شده برای "+(scoredTeam===0?homeLabel:awayLabel)+".");replayGoalPending=null;}}else{const minute=Math.floor(gameSeconds/60),ev=replayGoals.find(x=>!x.done&&x.minute<=minute);if(ev){ev.done=true;if((ev.team===0&&homeScore<replayTargetHome)||(ev.team===1&&awayScore<replayTargetAway)){const shooter=players.find(p=>p.team===ev.team&&p.idx>8)||players.find(p=>p.team===ev.team);if(shooter){shooter.root.position.x=ev.team===0?38:-38;shooter.root.position.z=0;ball.position.set(shooter.root.position.x+(ev.team===0?1:-1),.4,0);ballVelocity.set(ev.team===0?25:-25,0,0);owner=null;replayGoalPending={team:ev.team,remaining:.62};log("⚽ "+ev.minute+"′ · "+(ev.team===0?homeLabel:awayLabel)+" به سمت دروازه شوت می‌زند!");}}}}while(!replayGoalPending&&homeScore<replayTargetHome&&replayGoals.every(ev=>ev.done)){goal(0)}while(!replayGoalPending&&awayScore<replayTargetAway&&replayGoals.every(ev=>ev.done)){goal(1)}}
     actionIn-=dt*45;
-    if(owner){moveBallToOwner();if(actionIn<=0)chooseAction();}
+    if(replayGoalPending){owner=null;}else if(owner){moveBallToOwner();if(actionIn<=0)chooseAction();}
     else{
       ball.position.x+=ballVelocity.x*dt;ball.position.z+=ballVelocity.z*dt;ballVelocity.scaleInPlace(Math.pow(.988,dt*60));
       // Nearest player can intercept a pass or collect a loose ball.
       const nearest=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);
       if(nearest&&dist(nearest.root.position,ball.position)<1.55&&ball.position.x>-51&&ball.position.x<51){owner=nearest;ballVelocity.set(0,0,0);actionIn=rand(45,100);log(nearest.team===0?"آبی‌ها توپ را کنترل کردند.":"سبزها توپ را کنترل کردند.");}
-      if(Math.abs(ball.position.x)>52.5){if(Math.abs(ball.position.z)<3.7){goal(ball.position.x>0?0:1);}else{ball.position.x=clamp(ball.position.x,-52.4,52.4);ballVelocity.x*=-.35;owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);log("توپ از خط انتهایی بیرون رفت؛ مالکیت عوض شد.");}}
+      if(Math.abs(ball.position.x)>52.5){if(Math.abs(ball.position.z)<3.7&&!replayMode){goal(ball.position.x>0?0:1);}else{ball.position.x=clamp(ball.position.x,-52.4,52.4);ballVelocity.x*=-.35;owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);if(!replayMode)log("توپ از خط انتهایی بیرون رفت؛ مالکیت عوض شد.");}}
     }
     players.forEach(p=>{
       const dir=p.team===0?1:-1, ownBall=owner===p, isAttacking=owner&&owner.team===p.team;
@@ -121,5 +127,5 @@
   $("shootBtn").addEventListener("click",()=>{if(!running&&!halftime&&!matchEnded)running=true;if(!owner)owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);chooseAction("shot");ui();});
   scene.onBeforeRenderObservable.add(()=>update(Math.min(engine.getDeltaTime()/1000,.05)));
   engine.runRenderLoop(()=>scene.render());window.addEventListener("resize",()=>engine.resize());
-  scene.executeWhenReady(()=>loading.classList.add("hidden"));reset();
+  scene.executeWhenReady(()=>loading.classList.add("hidden"));reset();if(replayMode){running=true;log("▶ بازپخش خودکار شروع شد؛ نتیجه نهایی با گزارش مسابقه هماهنگ است.");ui();}
 })();
