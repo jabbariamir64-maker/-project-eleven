@@ -1,5 +1,6 @@
 (()=>{"use strict";
 const D=window.P11_DATA,SKEY="project-eleven-save-v1",$=s=>document.querySelector(s),num=n=>new Intl.NumberFormat("fa-IR").format(n||0),money=n=>num(Math.round(n||0))+" ت",clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const escapeHtml=value=>String(value??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
 const titles={dashboard:"داشبورد باشگاه",squad:"ترکیب تیم",market:"بازار نقل‌وانتقالات",fixtures:"مسابقات و جدول",tactics:"تاکتیک و تمرین",predictions:"پیش‌بینی رایگان",history:"آمار و تاریخچه",cup:"جام حذفی",facilities:"باشگاه و امکانات",social:"شبکه باشگاه‌ها",news:"اخبار فوتبال",messages:"دایرکت",clubProfile:"صفحه باشگاه",playerProfile:"پرونده بازیکن"};let active="dashboard",toastTimer;
 function toast(s){const e=$("#toast");e.textContent=s;e.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove("show"),2500)}
 function fixtures(clubs){let rot=clubs.map(c=>c.id),out=[];for(let r=0;r<7;r++){for(let i=0;i<4;i++){let h=rot[i],a=rot[7-i];if(r%2)[h,a]=[a,h];out.push({id:"r"+(r+1)+"g"+i,round:r+1,home:h,away:a,played:false,homeGoals:null,awayGoals:null,events:[]})}rot=[rot[0],rot[7],...rot.slice(1,7)]}out.slice().forEach(m=>out.push({id:m.id+"b",round:m.round+7,home:m.away,away:m.home,played:false,homeGoals:null,awayGoals:null,events:[]}));return out}
