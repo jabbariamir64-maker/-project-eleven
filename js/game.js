@@ -50,8 +50,9 @@ const keys=["pace","acceleration","agility","strength","stamina","balance","drib
 keys.forEach(k=>{if(!Number.isFinite(Number(p[k]))){let source=base;if(k==="pace"&&Number.isFinite(Number(p.pace)))source=Number(p.pace);if(k==="shoot"&&Number.isFinite(Number(p.shoot)))source=Number(p.shoot);if(k==="pass"&&Number.isFinite(Number(p.pass)))source=Number(p.pass);if(["tackling","marking","positioning"].includes(k)&&Number.isFinite(Number(p.defense)))source=Number(p.defense);p[k]=skillFallback({id},k,source)}else p[k]=clamp(Math.round(Number(p[k])),10,110)});
 const seed=stableSeed(id),code=p.code||"CM";if(!POSITION_META[p.naturalCode])p.naturalCode=code;
 if(!Number.isFinite(Number(p.height))){let lo=168,hi=190;if(code==="GK"){lo=183;hi=198}else if(code==="CB"){lo=182;hi=197}else if(["CF","ST"].includes(code)){lo=176;hi=198}else if(["RW","LW","RM","LM"].includes(code)){lo=164;hi=188}p.height=lo+(seed%(hi-lo+1))}
-if(!Number.isFinite(Number(p.weight))){const frame=((seed>>>7)%13)-6;p.weight=Math.round((Number(p.height)-100)*.84+frame)}
+if(!Number.isFinite(Number(p.weight))){const frame=((seed>>>7)%13)-6;p.weight=Math.round((Number(p.height)-100)*.9+frame)}
 p.height=clamp(Math.round(Number(p.height)),150,215);p.weight=clamp(Math.round(Number(p.weight)),45,140);
+if(!p.bodyEffectsApplied){const heightBonus=clamp((p.height-178)*.22,-4,5),idealWeight=(p.height-100)*.9,weightDifference=p.weight-idealWeight;p.heading=clamp(p.heading+Math.round(heightBonus*.55),10,110);p.jumping=clamp(p.jumping+Math.round(heightBonus*.4),10,110);if(weightDifference>8){const penalty=Math.min(6,Math.round((weightDifference-8)*.35));p.acceleration=clamp(p.acceleration-penalty,10,110);p.agility=clamp(p.agility-penalty,10,110)}else if(weightDifference< -8){p.strength=clamp(p.strength-Math.min(4,Math.round((-weightDifference-8)*.25)),10,110)}p.bodyEffectsApplied=true}
 if(!Number.isFinite(Number(p.potential)))p.potential=clamp(base+8+((seed>>>12)%25),10,110);else p.potential=clamp(Math.round(Number(p.potential)),10,110);
 p.defense=Math.round((p.tackling+p.marking+p.positioning)/3);p.rating=calculateOverall(p);p.value=playerValue(p);return p
 }
@@ -154,8 +155,8 @@ let ps=c.players.filter(p=>p.starter&&!p.injury);if(ps.length<7)ps=c.players.fil
 ps.forEach(ensurePlayerModel);
 const t=tacticsFor(c),fitness=avg(ps,"fitness");
 let fit=0;ps.forEach(p=>{const y=Number.isFinite(p.posY)?p.posY:(p.code==="GK"?90:["CB","RB","LB","RWB","LWB"].includes(p.code)?70:["CDM","CM","CAM","RM","LM"].includes(p.code)?52:27);const expected=p.code==="GK"?90:["CB","RB","LB","RWB","LWB"].includes(p.code)?70:["CDM","CM","CAM","RM","LM"].includes(p.code)?52:27;fit+=clamp(1-Math.abs(y-expected)/110,.62,1)});fit/=ps.length;
-const attack=avg(ps,"finishing")*.19+avg(ps,"shoot")*.12+avg(ps,"shotPower")*.06+avg(ps,"pace")*.12+avg(ps,"acceleration")*.08+avg(ps,"dribbling")*.12+avg(ps,"ballControl")*.11+avg(ps,"pass")*.1+avg(ps,"throughPass")*.1;
-const defense=avg(ps,"tackling")*.19+avg(ps,"marking")*.17+avg(ps,"positioning")*.17+avg(ps,"strength")*.13+avg(ps,"heading")*.08+avg(ps,"stamina")*.08+avg(ps,"pace")*.06+avg(ps,"balance")*.04+avg(ps,"composure")*.08;
+const attack=(avg(ps,"finishing")*.19+avg(ps,"shoot")*.12+avg(ps,"shotPower")*.06+avg(ps,"pace")*.12+avg(ps,"acceleration")*.08+avg(ps,"dribbling")*.12+avg(ps,"ballControl")*.11+avg(ps,"pass")*.1+avg(ps,"throughPass")*.1)*fit;
+const defense=(avg(ps,"tackling")*.19+avg(ps,"marking")*.17+avg(ps,"positioning")*.17+avg(ps,"strength")*.13+avg(ps,"heading")*.08+avg(ps,"stamina")*.08+avg(ps,"pace")*.06+avg(ps,"balance")*.04+avg(ps,"composure")*.08)*fit;
 const gks=c.players.filter(p=>p.code==="GK");const keeper=gks.length?Math.max(...gks.map(p=>(p.goalkeeping*.55+p.reaction*.25+p.positioning*.2)*(p.fitness||75)/100)):Math.max(25,defense*.68);
 let atkMod=0,defMod=0,poss=50;
 if(t.style==="possession"){atkMod+=(t.build==="short"?(avg(ps,"pass")+avg(ps,"ballControl")-80)*.008:0.02);poss+=12}
@@ -192,7 +193,7 @@ const fitnessPenalty=Math.max(0,70-team.fitness)*.0035;
 const matchup=(team.attack-opp.defense)*.018+(team.attack-team.keeper)*.004;
 return clamp(1.12+matchup+edge.atk-oppEdge.def+homeAdv-fitnessPenalty,.12,3.25)
 }
-const hx=expected(H,A,he,ae,(m.home===state.clubId ? .12 : .14)),ax=expected(A,H,ae,he,(m.away===state.clubId ? .12 : .02));
+const hx=expected(H,A,he,ae,.14),ax=expected(A,H,ae,he,.02);
 const hg=poisson(hx),ag=poisson(ax);
 m.played=true;m.homeGoals=hg;m.awayGoals=ag;m.events=[];
 m.stats={home:{xg:Number(hx.toFixed(2)),possession:clamp(Math.round(he.poss+(avg(H.ps,"pass")-avg(A.ps,"pass"))*.22),25,75),shots:0,onTarget:0,corners:0},away:{xg:Number(ax.toFixed(2)),possession:clamp(Math.round(ae.poss+(avg(A.ps,"pass")-avg(H.ps,"pass"))*.22),25,75),shots:0,onTarget:0,corners:0}};
