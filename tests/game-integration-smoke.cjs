@@ -32,6 +32,23 @@ const assert = require('node:assert/strict');
     const homeId = new URL(src, 'http://127.0.0.1:4173/').searchParams.get('homeId');
     const awayId = new URL(src, 'http://127.0.0.1:4173/').searchParams.get('awayId');
     assert.ok(fixtureId && homeId && awayId, 'live iframe receives fixture and club identifiers');
+    const rosterData = await page.frameLocator('#view-root iframe').locator('body').evaluate(() => {
+      const p = new URLSearchParams(location.search);
+      return {
+        home: JSON.parse(p.get('homePlayers') || '[]'),
+        away: JSON.parse(p.get('awayPlayers') || '[]'),
+        formation: p.get('formation'), strategy: p.get('strategy'),
+        homeColor: p.get('homeColor'), awayColor: p.get('awayColor')
+      };
+    });
+    assert.equal(rosterData.home.length, 11, 'the home starting XI is passed into the 3D engine');
+    assert.equal(rosterData.away.length, 11, 'the away starting XI is passed into the 3D engine');
+    assert.ok(rosterData.home.every(p => p.id && p.name && Number.isFinite(p.pace)), 'real home player identities and attributes are included');
+    assert.ok(rosterData.away.every(p => p.id && p.name && Number.isFinite(p.pace)), 'real away player identities and attributes are included');
+    assert.ok(['442', '433', '352'].includes(rosterData.formation), 'saved formation is mapped into the 3D engine');
+    assert.ok(['balanced', 'press', 'defensive', 'attack'].includes(rosterData.strategy), 'saved team mentality is mapped into the 3D engine');
+    assert.match(rosterData.homeColor, /^#[0-9a-f]{6}$/i, 'home kit color is passed into the 3D engine');
+    assert.match(rosterData.awayColor, /^#[0-9a-f]{6}$/i, 'away kit color is passed into the 3D engine');
     // Send a representative full-time result from the real child-frame origin/source to exercise league persistence.
     await page.frameLocator('#view-root iframe').locator('body').evaluate(() => {
       const p = new URLSearchParams(location.search);
@@ -57,7 +74,7 @@ const assert = require('node:assert/strict');
     assert.equal(liveFixture.events.filter(x => x.type === 'goal').length, 3, 'goal timeline is persisted');
     assert.ok(saved.fixtures.filter(x => x.round === liveFixture.round).every(x => x.played), 'the full league round is completed exactly once');
     assert.deepEqual(errors, [], 'main game and embedded match have no uncaught page errors');
-    console.log(JSON.stringify({ result: 'PASS', checks: ['club onboarding completed','live match navigation works','iframe points to 3D match prototype with club names','Babylon scene loads inside main game','canvas and radar visible','live full-time score and stats persisted','all fixtures in round completed','league week advanced once','no uncaught page errors'], fixtureId, score: [liveFixture.homeGoals, liveFixture.awayGoals], week: saved.week, errors }, null, 2));
+    console.log(JSON.stringify({ result: 'PASS', checks: ['club onboarding completed','live match navigation works','iframe points to 3D match prototype with club names','Babylon scene loads inside main game','canvas and radar visible','actual starting XIs, player attributes, kits, and tactics are connected','live full-time score and stats persisted','all fixtures in round completed','league week advanced once','no uncaught page errors'], fixtureId, score: [liveFixture.homeGoals, liveFixture.awayGoals], week: saved.week, errors }, null, 2));
   } finally {
     await browser.close();
   }
