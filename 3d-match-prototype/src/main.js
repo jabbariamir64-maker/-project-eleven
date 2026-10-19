@@ -53,6 +53,11 @@
     const leg=BABYLON.MeshBuilder.CreateBox("leg",{width:.19,height:.62,depth:.22},scene);leg.parent=root;leg.position.set(-.16,.31,0);leg.material=darkMat;const leg2=leg.clone("leg");leg2.parent=root;leg2.position.x=.16;
     const arm=BABYLON.MeshBuilder.CreateCapsule("arm",{height:.82,radius:.13,tessellation:7,subdivisions:1},scene);arm.parent=root;arm.position.set(-.43,1.12,0);arm.rotation.z=-.18;arm.material=team===0?blueMat:greenMat;const arm2=arm.clone("arm");arm2.parent=root;arm2.position.x=.43;arm2.rotation.z=.18;
     const shorts=BABYLON.MeshBuilder.CreateBox("shorts",{width:.52,height:.28,depth:.34},scene);shorts.parent=root;shorts.position.y=.48;shorts.material=team===0?blueMat:greenMat;
+    const bootMat=mat("boot-"+team+"-"+idx,"#101722");
+    for(const shin of [leg,leg2]){const boot=BABYLON.MeshBuilder.CreateBox("boot",{width:.22,height:.12,depth:.36},scene);boot.parent=shin;boot.position.set(0,-.29,.055);boot.material=bootMat;}
+    const numberTexture=new BABYLON.DynamicTexture("shirt-number-texture-"+team+"-"+idx,{width:128,height:128},scene,true);numberTexture.hasAlpha=true;numberTexture.drawText(String(idx+1),null,98,"bold 88px Arial","#ffffff","transparent",true);
+    const numberMaterial=new BABYLON.StandardMaterial("shirt-number-material-"+team+"-"+idx,scene);numberMaterial.diffuseTexture=numberTexture;numberMaterial.opacityTexture=numberTexture;numberMaterial.useAlphaFromDiffuseTexture=true;numberMaterial.emissiveColor=new BABYLON.Color3(.8,.8,.8);numberMaterial.backFaceCulling=false;
+    const shirtNumber=BABYLON.MeshBuilder.CreatePlane("shirt-number-"+team+"-"+idx,{width:.28,height:.3},scene);shirtNumber.parent=root;shirtNumber.position.set(0,1.08,-.345);shirtNumber.rotation.y=Math.PI;shirtNumber.material=numberMaterial;
     root.position.set(x,0,z);root.rotation.y=team===0?Math.PI/2:-Math.PI/2;
     // Individual ratings drive choices and ball execution; keep ratings different player to player.
     const p={team,idx,root,leg,leg2,arm,arm2,home:new BABYLON.Vector3(x,0,z),target:new BABYLON.Vector3(x,0,z),phase:rand(0,6.28),pace:rand(62,94),passing:rand(48,96),shooting:rand(42,96),technique:rand(45,97),control:rand(48,95),defending:rand(45,94),stamina:100};
