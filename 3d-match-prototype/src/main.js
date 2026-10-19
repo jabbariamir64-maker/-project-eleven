@@ -38,9 +38,11 @@
     const body=BABYLON.MeshBuilder.CreateCapsule("body",{height:1.55,radius:.34,tessellation:8,subdivisions:2},scene);body.parent=root;body.position.y=.94;body.material=team===0?blueMat:greenMat;
     const head=BABYLON.MeshBuilder.CreateSphere("head",{diameter:.48,segments:10},scene);head.parent=root;head.position.y=1.92;head.material=skinMat;
     const leg=BABYLON.MeshBuilder.CreateBox("leg",{width:.19,height:.62,depth:.22},scene);leg.parent=root;leg.position.set(-.16,.31,0);leg.material=darkMat;const leg2=leg.clone("leg");leg2.parent=root;leg2.position.x=.16;
+    const arm=BABYLON.MeshBuilder.CreateCapsule("arm",{height:.82,radius:.13,tessellation:7,subdivisions:1},scene);arm.parent=root;arm.position.set(-.43,1.12,0);arm.rotation.z=-.18;arm.material=team===0?blueMat:greenMat;const arm2=arm.clone("arm");arm2.parent=root;arm2.position.x=.43;arm2.rotation.z=.18;
+    const shorts=BABYLON.MeshBuilder.CreateBox("shorts",{width:.52,height:.28,depth:.34},scene);shorts.parent=root;shorts.position.y=.48;shorts.material=team===0?blueMat:greenMat;
     root.position.set(x,0,z);root.rotation.y=team===0?Math.PI/2:-Math.PI/2;
     // Individual ratings drive choices and ball execution; keep ratings different player to player.
-    const p={team,idx,root,home:new BABYLON.Vector3(x,0,z),target:new BABYLON.Vector3(x,0,z),phase:rand(0,6.28),pace:rand(62,94),passing:rand(48,96),shooting:rand(42,96),technique:rand(45,97),control:rand(48,95),defending:rand(45,94),stamina:100};
+    const p={team,idx,root,leg,leg2,arm,arm2,home:new BABYLON.Vector3(x,0,z),target:new BABYLON.Vector3(x,0,z),phase:rand(0,6.28),pace:rand(62,94),passing:rand(48,96),shooting:rand(42,96),technique:rand(45,97),control:rand(48,95),defending:rand(45,94),stamina:100};
     players.push(p);return p;
   }
   const homeFormation=[[-45,0],[-36,-22],[-36,-8],[-36,8],[-36,22],[-20,-24],[-20,-8],[-20,8],[-20,24],[-7,-9],[-7,9]];
@@ -102,19 +104,23 @@
       ball.position.x+=ballVelocity.x*dt;ball.position.z+=ballVelocity.z*dt;ballVelocity.scaleInPlace(Math.pow(.988,dt*60));
       // Nearest player can intercept a pass or collect a loose ball.
       const nearest=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);
-      if(nearest&&dist(nearest.root.position,ball.position)<1.55&&ball.position.x>-51&&ball.position.x<51){owner=nearest;ballVelocity.set(0,0,0);actionIn=rand(45,100);log(nearest.team===0?"آبی‌ها توپ را کنترل کردند.":"سبزها توپ را کنترل کردند.");}
-      if(Math.abs(ball.position.x)>52.5){if(replayMode&&replayGoalPending){ball.position.x=Math.sign(ball.position.x)*53;ballVelocity.set(0,0,0);}else if(Math.abs(ball.position.z)<3.7&&!replayMode){goal(ball.position.x>0?0:1);}else{ball.position.x=clamp(ball.position.x,-52.4,52.4);ballVelocity.x*=-.35;owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);if(!replayMode)log("توپ از خط انتهایی بیرون رفت؛ مالکیت عوض شد.");}}
+      if(nearest&&dist(nearest.root.position,ball.position)<1.55&&ball.position.x>-53.5&&ball.position.x<53.5){owner=nearest;ballVelocity.set(0,0,0);actionIn=rand(45,100);log(nearest.idx===0?"🧤 دروازه‌بان توپ را مهار کرد.":nearest.team===0?"آبی‌ها توپ را کنترل کردند.":"سبزها توپ را کنترل کردند.");}
+      if(Math.abs(ball.position.x)>52.5&&!owner){if(replayMode&&replayGoalPending){ball.position.x=Math.sign(ball.position.x)*53;ballVelocity.set(0,0,0);}else if(Math.abs(ball.position.z)<3.7&&!replayMode){goal(ball.position.x>0?0:1);}else{ball.position.x=clamp(ball.position.x,-52.4,52.4);ballVelocity.x*=-.35;owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);if(!replayMode)log("توپ از خط انتهایی بیرون رفت؛ مالکیت عوض شد.");}}
     }
     players.forEach(p=>{
       const dir=p.team===0?1:-1, ownBall=owner===p, isAttacking=owner&&owner.team===p.team;
       if(ownBall){p.target.set(clamp(p.root.position.x+dir*3,-49,49),0,p.root.position.z);}
       else if(owner&&owner.team!==p.team){const d=dist(p.root.position,owner.root.position);if(d<24){p.target.set(owner.root.position.x-dir*1.2,0,owner.root.position.z+(p.idx%2?2:-2));}else{p.target.set(p.home.x+(owner.root.position.x-p.home.x)*.16,0,p.home.z+(owner.root.position.z-p.home.z)*.16);}}
       else if(isAttacking){const forward=p.idx>8?10:4;p.target.set(clamp(p.home.x+dir*forward,-47,47),0,p.home.z);}
+      else if(p.idx===0&&!owner&&Math.abs(ball.position.x)>31&&(p.team===0?ball.position.x<0:ball.position.x>0)){p.target.set(p.home.x,0,clamp(ball.position.z,-6.2,6.2));}
       else p.target.copyFrom(p.home);
       const dx=p.target.x-p.root.position.x,dz=p.target.z-p.root.position.z,d=Math.hypot(dx,dz),pace=(p.pace/75)*(p.stamina/100);
       const step=Math.min(d,dt*(owner&&dist(p.root.position,owner.root.position)<8?5.5*pace:3.4*pace));
       if(d>.01){p.root.position.x+=dx/d*step;p.root.position.z+=dz/d*step;p.root.rotation.y=Math.atan2(dx,dz);}
       p.phase+=dt*(5+p.pace/18);p.root.position.y=Math.abs(Math.sin(p.phase))*.035;
+      const stride=d>.12?Math.sin(p.phase)*.58:Math.sin(p.phase*.45)*.035;
+      p.leg.rotation.z=stride;p.leg2.rotation.z=-stride;
+      p.arm.rotation.z=-.18-stride*.48;p.arm2.rotation.z=.18+stride*.48;
       if(running)p.stamina=Math.max(55,p.stamina-dt*.025);
     });
     camera.setTarget(new BABYLON.Vector3((ball.position.x||0)*.25,0,(ball.position.z||0)*.18));
