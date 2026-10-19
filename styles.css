@@ -6,3 +6,7 @@
 
 /* PES-inspired interactive tactics pitch */
 .pitch-player{touch-action:none;user-select:none;cursor:grab;z-index:3;transition:box-shadow .12s,background .12s}.pitch-player:active{cursor:grabbing}.pitch-player.is-selected,.bench-player.is-selected{outline:2px solid #f4c96b;box-shadow:0 0 0 4px #f4c96b33}.bench-player{touch-action:manipulation}.tactics-settings .field-label{margin-bottom:4px}.football-pitch{user-select:none}
+
+/* PES-style player roles and individual instructions */
+.role-panel{margin-top:14px;background:#101b2e;border:1px solid var(--line);border-radius:12px;padding:14px}.role-panel h3{margin:0 0 12px;font-size:14px}.role-panel .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.role-panel .field{width:100%;min-width:0;margin-top:5px}.individual-row{padding:10px 0;border-top:1px solid #263650}.individual-row>b{display:block;font-size:12px;margin-bottom:8px}.individual-row>div{display:grid;grid-template-columns:1fr 1fr;gap:8px}.individual-row label{display:grid;gap:4px;color:var(--muted);font-size:10px}.individual-row select{font-size:11px;padding:7px}
+@media(max-width:600px){.role-panel .form-grid{grid-template-columns:1fr}.individual-row>div{grid-template-columns:1fr 1fr}}
