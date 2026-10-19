@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <title>PROJECT ELEVEN — 3D Match Prototype</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">11</span><div><strong>PROJECT ELEVEN</strong><small>3D MATCH LAB · PROTOTYPE 01</small></div></div>
+      <span class="status"><i></i> نمونه مستقل</span>
+    </header>
+    <section class="scoreboard" aria-label="تابلوی نتیجه">
+      <div class="team team-home"><span class="crest blue">PE</span><div><b>آبی‌ها</b><small>HOME</small></div></div>
+      <div class="score"><strong id="homeScore">0</strong><span>:</span><strong id="awayScore">0</strong><small id="matchTime">00:00</small></div>
+      <div class="team team-away"><div><b>سبزها</b><small>AWAY</small></div><span class="crest green">11</span></div>
+    </section>
+    <section class="pitch-wrap">
+      <div class="pitch-label"><span>نمای سه‌بعدی مسابقه</span><span id="phaseLabel">آماده شروع</span></div>
+      <div id="renderHost"><canvas id="gameCanvas" aria-label="زمین فوتبال سه‌بعدی"></canvas><div id="loading">در حال آماده‌سازی زمین سه‌بعدی…</div></div>
+      <div class="legend"><span><i class="dot blue-dot"></i> تیم آبی</span><span><i class="dot green-dot"></i> تیم سبز</span><span><i class="dot ball-dot"></i> توپ</span></div>
+    </section>
+    <section class="controls">
+      <button id="startBtn" class="primary">▶ شروع مسابقه</button>
+      <button id="pauseBtn">Ⅱ توقف</button>
+      <button id="resetBtn">↻ شروع مجدد</button>
+      <button id="passBtn">↗ پاس آزمایشی</button>
+      <button id="shootBtn">⚽ شوت آزمایشی</button>
+    </section>
+    <section class="bottom-grid">
+      <article class="panel"><div class="panel-title"><span>گزارش رویدادها</span><span class="live-dot">LIVE</span></div><ul id="eventLog"><li>نمونه آماده است؛ شروع مسابقه را بزن.</li></ul></article>
+      <article class="panel note"><div class="panel-title">درباره این نسخه</div><p>این یک نمونه فنی مستقل است. حرکت توپ و ثبت گل از وضعیت شبیه‌سازی همین نمونه می‌آید؛ هنوز کیفیت گرافیکی یا انیمیشن در حد PES 2021 نیست.</p><p class="warning">بارگذاری Babylon.js به اتصال اینترنت نیاز دارد.</p></article>
+    </section>
+    <footer>PROJECT ELEVEN · مستقل از بازی اصلی · نسخه آزمایشی ۰۱</footer>
+  </main>
+  <script src="./src/main.js"></script>
+</body>
+</html>
