@@ -120,3 +120,33 @@
 .event-row small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
 .match-report-cover{align-items:center}
 @media(max-width:560px){.training-skill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tier-label{max-width:90px;font-size:10px!important}}
+
+
+/* Compact manager UI: less scrolling, tidy collapsible control cards */
+.compact-fold{min-width:0;overflow:hidden}
+.compact-fold>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;cursor:pointer;padding:12px 14px;font-size:13px;font-weight:800;color:#eaf2ff;background:linear-gradient(110deg,rgba(109,168,255,.10),rgba(255,255,255,.015));border-radius:11px;touch-action:manipulation}
+.compact-fold>summary::-webkit-details-marker{display:none}
+.compact-fold>summary:after{content:"＋";display:grid;place-items:center;flex:0 0 25px;width:25px;height:25px;border:1px solid #3a5274;border-radius:8px;color:var(--blue);font-size:15px}
+.compact-fold[open]>summary:after{content:"−"}
+.compact-fold>summary small{margin-right:auto;color:var(--muted);font-size:10px;font-weight:600}
+.compact-fold .fold-body{padding:12px 2px 2px}
+.tactics-advanced{grid-column:1/-1;border:1px solid var(--line);border-radius:12px;background:#0e192b}
+.tactics-advanced .fold-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px}
+.tactics-advanced .field-label{min-width:0}
+.role-panel.compact-fold{padding:0;margin-top:10px}
+.role-panel.compact-fold>summary{border-radius:11px}
+.role-panel.compact-fold .fold-body{padding:12px}
+.position-editor.compact-fold{padding:0;margin-top:12px;border-top:1px solid var(--line)}
+.position-editor.compact-fold>summary{border:1px solid var(--line);border-radius:11px}
+.training-skill-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.training-skill{align-items:center;text-align:center;padding:9px 5px;min-height:83px;justify-content:center;background:linear-gradient(145deg,#152640,#0e192b)}
+.training-skill span{font-size:11px;line-height:1.4}
+.training-skill b{font-size:18px}
+.training-skill small{font-size:9px}
+.training-row .panel{min-width:0}
+.training-row .list-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.training-row .list-row{display:flex;flex-direction:column;align-items:stretch;gap:8px;padding:10px;border:1px solid var(--line);border-radius:11px;background:#0d1729}
+.training-row .list-row .btn{width:100%;font-size:11px;padding:7px}
+.individual-row{padding:9px 0}
+@media(max-width:700px){.tactics-advanced .fold-body{grid-template-columns:1fr 1fr;gap:9px}.training-skill-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.training-skill{min-height:76px}.training-skill span{font-size:10px}}
+@media(max-width:420px){.compact-fold>summary{padding:10px;font-size:12px}.compact-fold>summary small{font-size:9px}.tactics-advanced .fold-body{grid-template-columns:1fr}.training-skill-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.training-row .list-stack{grid-template-columns:repeat(2,minmax(0,1fr))}.training-row .list-row{padding:8px}}
