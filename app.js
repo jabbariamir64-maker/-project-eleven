@@ -96,7 +96,7 @@
   }
   function marketView(){
     const c=userClub(),free=state.players.filter(p=>p.clubId!==c.id);
-    const list=free.slice().sort((a,b)=>b.overall-a.overall).map(p=>"<div class='list-row'><div class='row-main'><span class='avatar'>"+(p.position==="مهاجم"?"⚽":"♙")+"</span><div><strong>"+escapeHtml(p.name)+"</strong><small>"+escapeHtml(clubById(p.clubId).name)+" · "+escapeHtml(p.position)+" · سن "+fmt(p.age)+"</small></div></div><div style='text-align:left'><b style='display:block;font-size:12px'>"+money(p.value)+"</b><small class='muted'>قدرت "+fmt(p.overall)+"</small><div style='margin-top:7px'>"+button("خرید","buy-player","btn-primary btn-small","data-id='"+p.id+"'")+"</div></div></div>").join("");
+    const list=free.slice().sort((a,b)=>b.overall-a.overall).map(p=>"<div class='list-row'><div class='row-main'><span class='avatar'>"+(p.position==="مهاجم"?"⚽":"♙")+"</span><div><strong>"+escapeHtml(p.name)+"</strong><small>"+escapeHtml(p.clubId===-1?"بازیکن آزاد":clubById(p.clubId).name)+" · "+escapeHtml(p.position)+" · سن "+fmt(p.age)+"</small></div></div><div style='text-align:left'><b style='display:block;font-size:12px'>"+money(p.value)+"</b><small class='muted'>قدرت "+fmt(p.overall)+"</small><div style='margin-top:7px'>"+button(p.clubId===-1?"جذب":"خرید",p.clubId===-1?"sign-free":"buy-player","btn-primary btn-small","data-id='"+p.id+"'")+"</div></div></div>").join("");
     return "<div class='toolbar'><h2>بازار نقل‌وانتقالات</h2><div class='toolbar-controls'><input id='market-search' class='field' placeholder='نام بازیکن...' /><select id='market-position' class='select'><option value='all'>همه پست‌ها</option><option>دروازه‌بان</option><option>مدافع</option><option>هافبک</option><option>مهاجم</option></select></div></div><div class='stats-grid'>"+statCard("بودجه",money(c.budget),"بودجه فعلی","positive")+statCard("جای خالی",fmt(Math.max(0,c.capacity-squad(c.id).length)),"ظرفیت فهرست","")+statCard("بازیکنان قابل‌خرید",fmt(free.length),"از سایر باشگاه‌ها","")+statCard("پنجره نقل‌وانتقالات","باز","نسخه آزمایشی","positive")+"</div><div class='grid-2'><div>"+panel("بازیکنان در دسترس","<div id='market-list' class='list'>"+list+"</div>","برای خرید بودجه و جای خالی لازم است")+"</div><div>"+panel("قوانین بازار","<div class='list'><div class='list-row'><span>حداکثر فهرست</span><b>"+fmt(c.capacity)+" بازیکن</b></div><div class='list-row'><span>خرید بازیکن</span><b>کسر از بودجه</b></div><div class='list-row'><span>فروش بازیکن</span><b class='positive'>افزایش بودجه</b></div><div class='list-row'><span>آزادسازی بازیکن</span><b>۰ درآمد انتقالی</b></div></div><p class='muted' style='font-size:11px;line-height:2'>در این نسخه، نقل‌وانتقالات بین باشگاه‌های بازی انجام می‌شود. مذاکره کامل قرارداد و بازار آنلاین در مراحل بعدی توسعه می‌آیند.</p>","مدیریت منصفانه")+"</div></div>";
   }
   function tacticsView(){
@@ -170,6 +170,7 @@
   function confirmAction(title,body,yesAction,yesLabel){modal(title,"<p>"+body+"</p>",[{label:"انصراف",action:"close-modal"},{label:yesLabel||"تأیید",action:yesAction,cls:"btn-primary"}]);}
   function buyPlayer(id){
     const p=playerById(id),c=userClub();if(!p||p.clubId===c.id)return;
+    if(p.clubId===-1){signFree(id);return;}
     if(squad(c.id).length>=c.capacity){toast("فهرست کامل است؛ اول یک بازیکن بفروش یا آزاد کن");return;}
     if(c.budget<p.value){toast("بودجه برای خرید این بازیکن کافی نیست");return;}
     const old=clubById(p.clubId);if(squad(old.id).length<=11){toast("این باشگاه برای حفظ حداقل ۱۱ بازیکن نمی‌تواند او را بفروشد");return;}
@@ -222,7 +223,7 @@
     const isMine=p.clubId===state.clubId;
     const body="<div class='player-top'><div class='player-face'>⚽</div><div class='player-name'><strong>"+escapeHtml(p.name)+"</strong><small>"+escapeHtml(p.position)+" · "+fmt(p.age)+" سال</small></div><div class='rating'>"+fmt(p.overall)+"</div></div><div class='stats-grid section-gap'>"+statCard("ارزش",money(p.value),"ارزش تخمینی","")+statCard("دستمزد",money(p.wage),"هفتگی","")+statCard("گل",fmt(p.goals),"فصل جاری","")+statCard("بازی",fmt(p.apps),"فصل جاری","")+"</div><div class='list'><div class='list-row'><span>آمادگی جسمانی</span><b>"+fmt(p.fitness)+"٪</b></div><div class='list-row'><span>روحیه</span><b>"+fmt(p.morale)+"٪</b></div><div class='list-row'><span>قرارداد</span><b>"+fmt(p.contract)+" فصل</b></div><div class='list-row'><span>باشگاه</span><b>"+escapeHtml(p.clubId===-1?"بازیکن آزاد":clubById(p.clubId).name)+"</b></div></div>";
     const actions=[{label:"بستن",action:"close-modal"}];
-    if(isMine){actions.push({label:"فروش بازیکن",action:"sell-"+p.id,cls:"btn-primary"},{label:"آزادسازی (۰ درآمد)",action:"release-"+p.id,cls:"btn-danger"});}
+    if(isMine){actions.push({label:"فروش بازیکن",action:"sell-player",cls:"btn-primary",attrs:"data-id='"+p.id+"'"},{label:"آزادسازی (۰ درآمد)",action:"release-player",cls:"btn-danger",attrs:"data-id='"+p.id+"'"});}
     else if(p.clubId!==-1)actions.push({label:"خرید بازیکن",action:"buy-player",cls:"btn-primary",attrs:"data-id='"+p.id+"'"});
     else actions.push({label:"خرید بازیکن آزاد",action:"sign-free",cls:"btn-primary",attrs:"data-id='"+p.id+"'"});
     modal("پرونده بازیکن",body,actions);
