@@ -160,6 +160,8 @@
       const nearest=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);
       if(nearest&&ball.position.y<1.55&&dist(nearest.root.position,ball.position)<1.55&&ball.position.x>-53.5&&ball.position.x<53.5){owner=nearest;possessionTeam=nearest.team;ballVelocity.set(0,0,0);ballVelocityY=0;actionIn=rand(45,100);log(nearest.idx===0?"🧤 دروازه‌بان توپ را مهار کرد.":nearest.team===0?"آبی‌ها توپ را کنترل کردند.":"سبزها توپ را کنترل کردند.");}
       if(Math.abs(ball.position.x)>52.5&&!owner){if(replayMode&&replayGoalPending){ball.position.x=Math.sign(ball.position.x)*53;ballVelocity.set(0,0,0);}else if(Math.abs(ball.position.z)<3.7&&ball.position.y<2.55&&!replayMode){goal(ball.position.x>0?0:1);}else{ball.position.x=clamp(ball.position.x,-52.4,52.4);ballVelocity.x*=-.35;owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);if(!replayMode)log("توپ از خط انتهایی بیرون رفت؛ مالکیت عوض شد.");}}
+      // Recover a dead loose ball instead of letting play stall forever after a missed pass/interception.
+      if(!replayMode&&!replayGoalPending&&!owner&&ball.position.y<.58&&ballVelocity.length()<1.6){owner=nearest;possessionTeam=nearest.team;ballVelocity.set(0,0,0);ballVelocityY=0;ball.position.set(nearest.root.position.x,.4,nearest.root.position.z);actionIn=rand(45,85);log("توپ متوقف شد؛ نزدیک‌ترین بازیکن مالکیت را گرفت و بازی ادامه یافت.");}
     }
     players.forEach(p=>{
       const dir=p.team===0?1:-1, ownBall=owner===p, isAttacking=owner&&owner.team===p.team;
