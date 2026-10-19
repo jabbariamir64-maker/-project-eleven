@@ -100,3 +100,23 @@
 @media(max-width:600px){.position-grid{grid-template-columns:1fr}.position-edit-row select{width:60%}}
 
 .position-code{display:inline-flex;align-items:center;justify-content:center;margin-inline:4px;padding:1px 5px;border:1px solid #4b6b94;border-radius:5px;background:#1a3150;color:#a9d0ff;font-size:10px;font-weight:900;direction:ltr;letter-spacing:.4px}
+
+/* PROJECT ELEVEN player-engine update */
+.tier-label{font-size:11px!important;line-height:1.6;white-space:normal;max-width:104px;text-align:center;padding:5px 8px}
+.training-skill-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.training-skill{display:flex;flex-direction:column;align-items:flex-start;gap:5px;padding:11px;border:1px solid var(--line);border-radius:12px;background:#101c30;color:var(--text);text-align:right;min-width:0}
+.training-skill span{font-size:12px;color:var(--text)}
+.training-skill b{font-size:20px;color:var(--green)}
+.training-skill small{font-size:10px;color:var(--muted)}
+.training-skill:disabled{opacity:.45;cursor:not-allowed}
+.player-training{margin-top:14px}
+.match-row-clickable{cursor:pointer;position:relative;padding-bottom:26px;transition:border-color .15s,transform .15s}
+.match-row-clickable:hover{border-color:var(--blue);transform:translateY(-1px)}
+.report-hint{position:absolute;bottom:5px;right:12px;color:var(--blue);font-size:10px}
+.event-row{display:grid;grid-template-columns:48px 26px minmax(0,1fr);gap:10px;align-items:center;padding:12px 2px;border-bottom:1px solid var(--line)}
+.event-row time{font-weight:800;color:var(--blue);direction:ltr;text-align:center}
+.event-dot{display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#1b2c45;font-size:12px}
+.goal-dot{background:#1d4c3e}
+.event-row small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
+.match-report-cover{align-items:center}
+@media(max-width:560px){.training-skill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tier-label{max-width:90px;font-size:10px!important}}
