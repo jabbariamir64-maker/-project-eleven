@@ -73,7 +73,7 @@ const assert = require('node:assert/strict');
         const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
         const f = document.querySelector('#view-root iframe');
         const m = s?.fixtures?.find(x => x.id === fixtureId);
-        return { week: s?.week, fixture: m && { id:m.id, round:m.round, played:m.played, homeGoals:m.homeGoals, awayGoals:m.awayGoals }, src:f?.getAttribute('src'), time:f?.contentDocument?.querySelector('#matchTime')?.innerText, phase:f?.contentDocument?.querySelector('#phaseLabel')?.innerText, homeScore:f?.contentDocument?.querySelector('#homeScore')?.innerText, awayScore:f?.contentDocument?.querySelector('#awayScore')?.innerText };
+        return { week: s?.week, fixture: m && { id:m.id, round:m.round, played:m.played, homeGoals:m.homeGoals, awayGoals:m.awayGoals }, live:new URL(f?.getAttribute('src')||'',location.href).searchParams.get('live'), matchDebug:window.__P11_LAST_RESULT_DEBUG, time:f?.contentDocument?.querySelector('#matchTime')?.innerText, phase:f?.contentDocument?.querySelector('#phaseLabel')?.innerText, homeScore:f?.contentDocument?.querySelector('#homeScore')?.innerText, awayScore:f?.contentDocument?.querySelector('#awayScore')?.innerText };
       }, { fixtureId });
       throw new Error('Full-time league sync timeout; diagnostics=' + JSON.stringify(diagnostics) + '; ' + error.message);
     }
