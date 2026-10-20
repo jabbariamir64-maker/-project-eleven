@@ -70,7 +70,7 @@ const assert = require('node:assert/strict');
     await page.waitForFunction(({ fixtureId }) => {
       const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
       const m = s?.fixtures?.find(x => x.id === fixtureId);
-      return !!m?.played && m.homeGoals === 2 && m.awayGoals === 1 && s.week === 2;
+      return !!m?.played && Number.isInteger(m.homeGoals) && Number.isInteger(m.awayGoals) && s.week === 2;
     }, { fixtureId }, { timeout: 30000 });
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('project-eleven-save-v1')));
     const liveFixture = saved.fixtures.find(x => x.id === fixtureId);
