@@ -52,19 +52,20 @@ const assert = require('node:assert/strict');
     assert.equal(rosterData.userSide, fixtureBeforeResult.home === savedState.clubId ? '0' : '1', 'the user\'s tactics are assigned to their actual home/away side');
     assert.match(rosterData.homeColor, /^#[0-9a-f]{6}$/i, 'home kit color is passed into the 3D engine');
     assert.match(rosterData.awayColor, /^#[0-9a-f]{6}$/i, 'away kit color is passed into the 3D engine');
-    // Send a representative full-time result from the real child-frame origin/source to exercise league persistence.
+    // Exercise the actual engine result sender deterministically. The separate
+    // extended test covers real clock progression through both halves.
+    await page.locator('#view-root iframe').evaluate(el => {
+      const u = new URL(el.src);
+      u.searchParams.set('testMode', '1');
+      el.src = u.toString();
+    });
+    await page.waitForFunction(() => {
+      const frame = document.querySelector('#view-root iframe');
+      return !!frame?.contentWindow?.__P11_TEST_FINISH_MATCH__ &&
+        frame.contentDocument?.querySelector('#loading')?.classList.contains('hidden');
+    }, undefined, { timeout: 60000 });
     await page.frameLocator('#view-root iframe').locator('body').evaluate(() => {
-      const p = new URLSearchParams(location.search);
-      window.parent.postMessage({
-        type: 'PROJECT_ELEVEN_MATCH_RESULT',
-        fixtureId: p.get('fixture'), homeId: p.get('homeId'), awayId: p.get('awayId'),
-        homeGoals: 2, awayGoals: 1,
-        goals: [{ minute: 17, team: 0 }, { minute: 53, team: 1 }, { minute: 84, team: 0 }],
-        stats: {
-          home: { shots: 8, onTarget: 4, passes: 76, tackles: 9, saves: 2, possession: 54 },
-          away: { shots: 5, onTarget: 2, passes: 61, tackles: 7, saves: 2, possession: 46 }
-        }
-      }, location.origin);
+      if (!window.__P11_TEST_FINISH_MATCH__()) throw new Error('test finish hook did not send the result');
     });
     await page.waitForFunction(({ fixtureId }) => {
       const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
