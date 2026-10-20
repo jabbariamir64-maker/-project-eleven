@@ -22,15 +22,21 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
     await page.locator('#speedBtn').click();
     assert.match(await page.locator('#speedBtn').innerText(), /2×/, 'speed control switches to 2x');
     await page.locator('#speedBtn').click();
+    assert.match(await page.locator('#speedBtn').innerText(), /4×/, 'speed control switches to 4x');
+    await page.locator('#speedBtn').click();
+    assert.match(await page.locator('#speedBtn').innerText(), /8×/, 'speed control switches to 8x');
+    await page.locator('#speedBtn').click();
     assert.match(await page.locator('#speedBtn').innerText(), /۰٫۵×/, 'speed control cycles to half speed');
     await page.locator('#speedBtn').click();
     assert.match(await page.locator('#speedBtn').innerText(), /1×/, 'speed control cycles back to normal');
     await page.locator('#formationSelect').selectOption('352');
     await page.locator('#strategySelect').selectOption('attack');
     assert.match(await page.locator('#tacticsStatus').innerText(), /۳-۵-۲.*هجومی/);
-    // Use the built-in 2x speed so the full 90-minute match can be covered reliably in CI.
+    // Use 8x speed so the full 90-minute match finishes quickly under software WebGL.
     await page.locator('#speedBtn').click();
-    assert.match(await page.locator('#speedBtn').innerText(), /2×/);
+    await page.locator('#speedBtn').click();
+    await page.locator('#speedBtn').click();
+    assert.match(await page.locator('#speedBtn').innerText(), /8×/);
     await page.locator('#startBtn').click();
     await page.waitForFunction(() => document.querySelector('#matchTime')?.innerText === '45:00', undefined, { timeout: 120000 });
     assert.match(await page.locator('#phaseLabel').innerText(), /نیمه اول/);
@@ -54,7 +60,9 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
     assert.ok(Number(stats.homePasses) + Number(stats.awayPasses) > 0, 'AI should attempt passes in a full match');
     assert.equal(parseInt(stats.possession[0]) + parseInt(stats.possession[1]), 100, 'possession percentages total 100');
     await page.locator('#startBtn').click();
-    assert.equal(await page.locator('#matchTime').innerText(), '00:00', 'start after full time begins a fresh match');
+    assert.match(await page.locator('#phaseLabel').innerText(), /مسابقه در جریان/, 'start after full time begins a fresh match');
+    assert.equal(await page.locator('#homeScore').innerText(), '0', 'fresh match clears home score');
+    assert.equal(await page.locator('#awayScore').innerText(), '0', 'fresh match clears away score');
     await page.locator('#resetBtn').click();
     assert.equal(await page.locator('#homeScore').innerText(), '0');
     results.push('stats remained valid and restart/reset restored a clean match');
