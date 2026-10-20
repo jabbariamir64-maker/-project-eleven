@@ -62,11 +62,21 @@ const assert = require('node:assert/strict');
     }, undefined, { timeout: 60000 });
     assert.match(await matchFrame.locator('#phaseLabel').innerText(), /نیمه اول/, 'real match reaches half-time');
     await matchFrame.locator('#startBtn').click();
-    await page.waitForFunction(({ fixtureId }) => {
-      const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
-      const m = s?.fixtures?.find(x => x.id === fixtureId);
-      return !!m?.played && Number.isInteger(m.homeGoals) && Number.isInteger(m.awayGoals) && s.week === 2;
-    }, { fixtureId }, { timeout: 60000 });
+    try {
+      await page.waitForFunction(({ fixtureId }) => {
+        const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
+        const m = s?.fixtures?.find(x => x.id === fixtureId);
+        return !!m?.played && Number.isInteger(m.homeGoals) && Number.isInteger(m.awayGoals) && s.week === 2;
+      }, { fixtureId }, { timeout: 20000 });
+    } catch (error) {
+      const diagnostics = await page.evaluate(({ fixtureId }) => {
+        const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
+        const f = document.querySelector('#view-root iframe');
+        const m = s?.fixtures?.find(x => x.id === fixtureId);
+        return { week: s?.week, fixture: m && { id:m.id, round:m.round, played:m.played, homeGoals:m.homeGoals, awayGoals:m.awayGoals }, src:f?.getAttribute('src'), time:f?.contentDocument?.querySelector('#matchTime')?.innerText, phase:f?.contentDocument?.querySelector('#phaseLabel')?.innerText, homeScore:f?.contentDocument?.querySelector('#homeScore')?.innerText, awayScore:f?.contentDocument?.querySelector('#awayScore')?.innerText };
+      }, { fixtureId });
+      throw new Error('Full-time league sync timeout; diagnostics=' + JSON.stringify(diagnostics) + '; ' + error.message);
+    }
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('project-eleven-save-v1')));
     const liveFixture = saved.fixtures.find(x => x.id === fixtureId);
     assert.equal(liveFixture.played, true, 'actual 3D full-time result is saved');
