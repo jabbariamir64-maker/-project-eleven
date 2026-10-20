@@ -236,7 +236,7 @@ function liveMatchView(){
   const formationKey=state.formation==="4-3-3"?"433":state.formation==="3-5-2"?"352":"442";
   const mentality=state.mentality||"balanced",tactics=state.tactics||{};
   const strategyKey=mentality==="defensive"?"defensive":tactics.style==="press"||Number(tactics.pressing)>75?"press":mentality==="attacking"||["counter","wing","direct"].includes(tactics.style)?"attack":"balanced";
-  params.set("formation",formationKey);params.set("strategy",strategyKey);
+  params.set("formation",formationKey);params.set("strategy",strategyKey);params.set("userSide",selected.home===c.id?"0":"1");
  }
  if(selected.played){params.set("hg",String(selected.homeGoals||0));params.set("ag",String(selected.awayGoals||0));params.set("goals",goals.map(x=>x.minute+":"+x.team).join(","))}
  const src="3d-match-prototype/index.html?"+params.toString();const fullParams=new URLSearchParams(params);fullParams.delete("live");fullParams.delete("fixture");fullParams.delete("homeId");fullParams.delete("awayId");const fullSrc="3d-match-prototype/index.html?"+fullParams.toString();
