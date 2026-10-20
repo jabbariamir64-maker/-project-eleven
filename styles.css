@@ -489,3 +489,13 @@ body{background:radial-gradient(ellipse at 76% -18%,rgba(36,75,127,.42),transpar
 .player-rating-track i{height:100%;display:block;border-radius:99px;background:linear-gradient(90deg,#367ce0,#5fd3a4)}
 .player-rating-row>strong{text-align:left;font-size:13px;font-variant-numeric:tabular-nums}
 @media(max-width:430px){.player-rating-row{grid-template-columns:20px minmax(80px,1fr) 45px 30px;gap:6px}.player-rating-name b{font-size:11px}}
+
+/* Season leaderboards */
+.season-stats-summary{margin:14px 0}
+.season-leaderboard{min-width:0;margin-bottom:12px}
+.season-player-label{display:flex;flex-direction:column;gap:4px;min-width:0}
+.season-player-label strong,.season-player-label small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.season-player-label strong{font-size:12px}
+.season-player-label small{font-size:10px;opacity:.72}
+.season-leaderboard .list-row{gap:10px}
+.season-leaderboard .rating{white-space:nowrap}
