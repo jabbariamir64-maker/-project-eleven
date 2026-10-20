@@ -469,3 +469,23 @@ body{background:radial-gradient(ellipse at 76% -18%,rgba(36,75,127,.42),transpar
 .technical-stat-track i:first-child{display:block;background:linear-gradient(90deg,#377de0,#76b7ff);border-radius:99px 0 0 99px}
 .technical-stat-track i:last-child{display:block;background:linear-gradient(90deg,#2cb88a,#7de6bf);border-radius:0 99px 99px 0}
 @media(max-width:480px){.technical-stat-label{font-size:11px}.technical-stat-label span{font-size:11px}}
+
+/* Individual match ratings */
+.player-performance-panel{margin:14px 0}
+.match-mvp-card{display:flex;align-items:center;gap:12px;padding:14px;margin:12px 0;border:1px solid rgba(245,190,70,.35);border-radius:14px;background:linear-gradient(110deg,rgba(245,190,70,.12),rgba(127,150,180,.06))}
+.mvp-star{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:rgba(245,190,70,.17);color:#f6c85f;font-size:26px;flex:0 0 42px}
+.match-mvp-card div:nth-child(2){display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.match-mvp-card small,.match-mvp-card span{font-size:11px;opacity:.75}
+.match-mvp-card b{font-size:14px}
+.match-mvp-card strong{font-size:18px;color:#f6c85f;white-space:nowrap}
+.player-rating-row{display:grid;grid-template-columns:24px minmax(90px,1fr) minmax(48px,.7fr) 34px;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid rgba(148,163,184,.12)}
+.player-rating-row:last-child{border-bottom:0}
+.player-rating-rank{font-size:11px;opacity:.6;text-align:center}
+.player-rating-name{display:flex;flex-direction:column;min-width:0;gap:3px}
+.player-rating-name b,.player-rating-name small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.player-rating-name b{font-size:12px}
+.player-rating-name small{font-size:10px;opacity:.7}
+.player-rating-track{height:7px;border-radius:99px;overflow:hidden;background:rgba(148,163,184,.14)}
+.player-rating-track i{height:100%;display:block;border-radius:99px;background:linear-gradient(90deg,#367ce0,#5fd3a4)}
+.player-rating-row>strong{text-align:left;font-size:13px;font-variant-numeric:tabular-nums}
+@media(max-width:430px){.player-rating-row{grid-template-columns:20px minmax(80px,1fr) 45px 30px;gap:6px}.player-rating-name b{font-size:11px}}
