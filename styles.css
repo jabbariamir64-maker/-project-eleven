@@ -456,3 +456,16 @@ body{background:radial-gradient(ellipse at 76% -18%,rgba(36,75,127,.42),transpar
 .match-lineup-player b{font-size:12px}
 .match-lineup-player small{font-size:10px;opacity:.72;margin-top:3px}
 @media(max-width:680px){.match-lineups-preview{grid-template-columns:1fr}.match-lineup-players{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Technical match report */
+.match-technical-panel{margin:14px 0}
+.technical-stat-row{padding:10px 0;border-bottom:1px solid rgba(148,163,184,.13)}
+.technical-stat-row:last-child{border-bottom:0}
+.technical-stat-label{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;margin-bottom:7px}
+.technical-stat-label b{font-weight:600}
+.technical-stat-label span{white-space:nowrap;color:#dbe8fa;font-variant-numeric:tabular-nums}
+.technical-stat-label i{font-style:normal;color:var(--muted);padding:0 4px}
+.technical-stat-track{display:flex;gap:3px;height:7px;overflow:hidden;border-radius:99px;background:rgba(148,163,184,.13)}
+.technical-stat-track i:first-child{display:block;background:linear-gradient(90deg,#377de0,#76b7ff);border-radius:99px 0 0 99px}
+.technical-stat-track i:last-child{display:block;background:linear-gradient(90deg,#2cb88a,#7de6bf);border-radius:0 99px 99px 0}
+@media(max-width:480px){.technical-stat-label{font-size:11px}.technical-stat-label span{font-size:11px}}
