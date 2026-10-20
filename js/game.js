@@ -207,9 +207,11 @@ function syncLiveMatchResult(data,frame){
  commit("نتیجه سه‌بعدی در جدول لیگ ثبت شد؛ هفته "+num(m.round)+" تکمیل شد.");
 }
 window.addEventListener("message",event=>{
- if(event.origin!==window.location.origin)return;
- const frame=document.querySelector("#view-root iframe");if(!frame||event.source!==frame.contentWindow)return;
  const data=event.data;if(!data||data.type!=="PROJECT_ELEVEN_MATCH_RESULT")return;
+ const frame=document.querySelector("#view-root iframe"),m=state.fixtures.find(x=>x.id===data.fixtureId),next=state.fixtures.find(x=>!x.played&&(x.home===state.clubId||x.away===state.clubId));
+ window.__P11_LAST_RESULT_DEBUG={origin:event.origin,expectedOrigin:window.location.origin,sourceMatches:!!frame&&event.source===frame.contentWindow,onboardingComplete:state.onboardingComplete,fixtureId:data.fixtureId,homeId:data.homeId,awayId:data.awayId,homeGoals:data.homeGoals,awayGoals:data.awayGoals,fixtureFound:!!m,fixturePlayed:m?.played,fixtureHome:m?.home,fixtureAway:m?.away,fixtureRound:m?.round,week:state.week,nextFixtureId:next?.id,nextRound:next?.round,clubId:state.clubId,goalsAreIntegers:Number.isInteger(data.homeGoals)&&Number.isInteger(data.awayGoals)};
+ if(event.origin!==window.location.origin)return;
+ if(!frame||event.source!==frame.contentWindow)return;
  syncLiveMatchResult({...data,_source:event.source},frame);
 });
 function liveMatchView(){
