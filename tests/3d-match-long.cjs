@@ -22,6 +22,10 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
     await page.locator('#speedBtn').click();
     assert.match(await page.locator('#speedBtn').innerText(), /2×/, 'speed control switches to 2x');
     await page.locator('#speedBtn').click();
+    assert.match(await page.locator('#speedBtn').innerText(), /4×/, 'speed control switches to 4x');
+    await page.locator('#speedBtn').click();
+    assert.match(await page.locator('#speedBtn').innerText(), /8×/, 'speed control switches to 8x');
+    await page.locator('#speedBtn').click();
     assert.match(await page.locator('#speedBtn').innerText(), /۰٫۵×/, 'speed control cycles to half speed');
     await page.locator('#speedBtn').click();
     assert.match(await page.locator('#speedBtn').innerText(), /1×/, 'speed control cycles back to normal');
