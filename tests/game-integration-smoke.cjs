@@ -52,29 +52,30 @@ const assert = require('node:assert/strict');
     assert.equal(rosterData.userSide, fixtureBeforeResult.home === savedState.clubId ? '0' : '1', 'the user\'s tactics are assigned to their actual home/away side');
     assert.match(rosterData.homeColor, /^#[0-9a-f]{6}$/i, 'home kit color is passed into the 3D engine');
     assert.match(rosterData.awayColor, /^#[0-9a-f]{6}$/i, 'away kit color is passed into the 3D engine');
-    // Send a representative full-time result from the real child-frame origin/source to exercise league persistence.
+    // Exercise the actual engine result sender deterministically. The separate
+    // extended test covers real clock progression through both halves.
+    await page.locator('#view-root iframe').evaluate(el => {
+      const u = new URL(el.src);
+      u.searchParams.set('testMode', '1');
+      el.src = u.toString();
+    });
+    await page.waitForFunction(() => {
+      const frame = document.querySelector('#view-root iframe');
+      return !!frame?.contentWindow?.__P11_TEST_FINISH_MATCH__ &&
+        frame.contentDocument?.querySelector('#loading')?.classList.contains('hidden');
+    }, undefined, { timeout: 60000 });
     await page.frameLocator('#view-root iframe').locator('body').evaluate(() => {
-      const p = new URLSearchParams(location.search);
-      window.parent.postMessage({
-        type: 'PROJECT_ELEVEN_MATCH_RESULT',
-        fixtureId: p.get('fixture'), homeId: p.get('homeId'), awayId: p.get('awayId'),
-        homeGoals: 2, awayGoals: 1,
-        goals: [{ minute: 17, team: 0 }, { minute: 53, team: 1 }, { minute: 84, team: 0 }],
-        stats: {
-          home: { shots: 8, onTarget: 4, passes: 76, tackles: 9, saves: 2, possession: 54 },
-          away: { shots: 5, onTarget: 2, passes: 61, tackles: 7, saves: 2, possession: 46 }
-        }
-      }, location.origin);
+      if (!window.__P11_TEST_FINISH_MATCH__()) throw new Error('test finish hook did not send the result');
     });
     await page.waitForFunction(({ fixtureId }) => {
       const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
       const m = s?.fixtures?.find(x => x.id === fixtureId);
-      return !!m?.played && m.homeGoals === 2 && m.awayGoals === 1 && s.week === 2;
+      return !!m?.played && Number.isInteger(m.homeGoals) && Number.isInteger(m.awayGoals) && s.week === 2;
     }, { fixtureId }, { timeout: 30000 });
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('project-eleven-save-v1')));
     const liveFixture = saved.fixtures.find(x => x.id === fixtureId);
-    assert.equal(liveFixture.stats.home.shots, 8, 'live match stats are persisted');
-    assert.equal(liveFixture.events.filter(x => x.type === 'goal').length, 3, 'goal timeline is persisted');
+    assert.ok(Number.isFinite(liveFixture.stats.home.shots) && Number.isFinite(liveFixture.stats.away.shots), 'live match stats are persisted');
+    assert.equal(liveFixture.events.filter(x => x.type === 'goal').length, liveFixture.homeGoals + liveFixture.awayGoals, 'goal timeline matches the final score');
     assert.ok(saved.fixtures.filter(x => x.round === liveFixture.round).every(x => x.played), 'the full league round is completed exactly once');
     assert.deepEqual(errors, [], 'main game and embedded match have no uncaught page errors');
     console.log(JSON.stringify({ result: 'PASS', checks: ['club onboarding completed','live match navigation works','iframe points to 3D match prototype with club names','Babylon scene loads inside main game','canvas and radar visible','actual starting XIs, player attributes, kits, and tactics are connected','live full-time score and stats persisted','all fixtures in round completed','league week advanced once','no uncaught page errors'], fixtureId, score: [liveFixture.homeGoals, liveFixture.awayGoals], week: saved.week, errors }, null, 2));
