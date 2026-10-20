@@ -60,7 +60,9 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
     assert.ok(Number(stats.homePasses) + Number(stats.awayPasses) > 0, 'AI should attempt passes in a full match');
     assert.equal(parseInt(stats.possession[0]) + parseInt(stats.possession[1]), 100, 'possession percentages total 100');
     await page.locator('#startBtn').click();
-    assert.equal(await page.locator('#matchTime').innerText(), '00:00', 'start after full time begins a fresh match');
+    assert.match(await page.locator('#phaseLabel').innerText(), /مسابقه در جریان/, 'start after full time begins a fresh match');
+    assert.equal(await page.locator('#homeScore').innerText(), '0', 'fresh match clears home score');
+    assert.equal(await page.locator('#awayScore').innerText(), '0', 'fresh match clears away score');
     await page.locator('#resetBtn').click();
     assert.equal(await page.locator('#homeScore').innerText(), '0');
     results.push('stats remained valid and restart/reset restored a clean match');
