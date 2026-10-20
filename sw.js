@@ -1,5 +1,5 @@
 "use strict";
-const CACHE="p11-shell-v8";
+const CACHE="p11-shell-v9";
 const CORE=["./","./index.html","./styles.css?v=20261020-15","./js/data.js?v=20261020-09","./js/game.js?v=20261020-31","./js/backup.js?v=20261020-03","./app-manifest.json?v=20261020-01","./assets/icon.svg","./assets/project-eleven-assets.js?v=20261020-12"];
 self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE.map(url=>new Request(url,{cache:"reload"})))).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith("p11-shell-")&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
