@@ -32,9 +32,11 @@ const launchArgs = ['--no-sandbox','--enable-webgl','--use-gl=angle','--use-angl
     await page.locator('#formationSelect').selectOption('352');
     await page.locator('#strategySelect').selectOption('attack');
     assert.match(await page.locator('#tacticsStatus').innerText(), /۳-۵-۲.*هجومی/);
-    // Use the built-in 2x speed so the full 90-minute match can be covered reliably in CI.
+    // Use 8x speed so the full 90-minute match finishes quickly under software WebGL.
     await page.locator('#speedBtn').click();
-    assert.match(await page.locator('#speedBtn').innerText(), /2×/);
+    await page.locator('#speedBtn').click();
+    await page.locator('#speedBtn').click();
+    assert.match(await page.locator('#speedBtn').innerText(), /8×/);
     await page.locator('#startBtn').click();
     await page.waitForFunction(() => document.querySelector('#matchTime')?.innerText === '45:00', undefined, { timeout: 120000 });
     assert.match(await page.locator('#phaseLabel').innerText(), /نیمه اول/);
