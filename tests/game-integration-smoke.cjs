@@ -48,8 +48,8 @@ const assert = require('node:assert/strict');
     assert.ok(['442', '433', '352'].includes(rosterData.formation), 'saved formation is mapped into the 3D engine');
     assert.ok(['balanced', 'press', 'defensive', 'attack'].includes(rosterData.strategy), 'saved team mentality is mapped into the 3D engine');
     const savedState = await page.evaluate(() => JSON.parse(localStorage.getItem('project-eleven-save-v1')));
-    const liveFixture = savedState.fixtures.find(m => m.id === fixtureId);
-    assert.equal(rosterData.userSide, liveFixture.home === savedState.clubId ? '0' : '1', 'the user\'s tactics are assigned to their actual home/away side');
+    const fixtureBeforeResult = savedState.fixtures.find(m => m.id === fixtureId);
+    assert.equal(rosterData.userSide, fixtureBeforeResult.home === savedState.clubId ? '0' : '1', 'the user\'s tactics are assigned to their actual home/away side');
     assert.match(rosterData.homeColor, /^#[0-9a-f]{6}$/i, 'home kit color is passed into the 3D engine');
     assert.match(rosterData.awayColor, /^#[0-9a-f]{6}$/i, 'away kit color is passed into the 3D engine');
     // Send a representative full-time result from the real child-frame origin/source to exercise league persistence.
