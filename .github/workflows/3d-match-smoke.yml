@@ -1,7 +1,7 @@
 name: 3D Match Browser Smoke Test
 on:
   push:
-    branches: [ai/babylon-match-sim, ai/live-match-league-sync, ai/stabilize-match-clock-test, main]
+    branches: [ai/babylon-match-sim, ai/live-match-league-sync, ai/stabilize-match-clock-test, ai/fulltime-match-fast-forward, main]
     paths:
       - '3d-match-prototype/**'
       - '.github/workflows/3d-match-smoke.yml'
