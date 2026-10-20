@@ -52,26 +52,24 @@ const assert = require('node:assert/strict');
     assert.equal(rosterData.userSide, fixtureBeforeResult.home === savedState.clubId ? '0' : '1', 'the user\'s tactics are assigned to their actual home/away side');
     assert.match(rosterData.homeColor, /^#[0-9a-f]{6}$/i, 'home kit color is passed into the 3D engine');
     assert.match(rosterData.awayColor, /^#[0-9a-f]{6}$/i, 'away kit color is passed into the 3D engine');
-    // Exercise the actual engine result sender deterministically. The separate
-    // extended test covers real clock progression through both halves.
-    await page.locator('#view-root iframe').evaluate(el => {
-      const u = new URL(el.src);
-      u.searchParams.set('testMode', '1');
-      el.src = u.toString();
-    });
+    // Play the actual 90-minute match in the embedded 3D engine. Its real
+    // full-time postMessage must persist the score, stats and league progression.
+    const matchFrame = page.frameLocator('#view-root iframe');
+    await matchFrame.locator('#gameCanvas').scrollIntoViewIfNeeded();
+    for (let i = 0; i < 3; i++) await matchFrame.locator('#speedBtn').click();
+    assert.match(await matchFrame.locator('#speedBtn').innerText(), /8×/, 'match speed can be set to 8x for a fast full-time simulation');
+    await matchFrame.locator('#startBtn').click();
     await page.waitForFunction(() => {
       const frame = document.querySelector('#view-root iframe');
-      return !!frame?.contentWindow?.__P11_TEST_FINISH_MATCH__ &&
-        frame.contentDocument?.querySelector('#loading')?.classList.contains('hidden');
+      return frame?.contentDocument?.querySelector('#matchTime')?.innerText === '45:00';
     }, undefined, { timeout: 60000 });
-    await page.frameLocator('#view-root iframe').locator('body').evaluate(() => {
-      if (!window.__P11_TEST_FINISH_MATCH__()) throw new Error('test finish hook did not send the result');
-    });
+    assert.match(await matchFrame.locator('#phaseLabel').innerText(), /نیمه اول/, 'real match reaches half-time');
+    await matchFrame.locator('#startBtn').click();
     await page.waitForFunction(({ fixtureId }) => {
       const s = JSON.parse(localStorage.getItem('project-eleven-save-v1') || 'null');
       const m = s?.fixtures?.find(x => x.id === fixtureId);
       return !!m?.played && Number.isInteger(m.homeGoals) && Number.isInteger(m.awayGoals) && s.week === 2;
-    }, { fixtureId }, { timeout: 30000 });
+    }, { fixtureId }, { timeout: 60000 });
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('project-eleven-save-v1')));
     const liveFixture = saved.fixtures.find(x => x.id === fixtureId);
     assert.ok(Number.isFinite(liveFixture.stats.home.shots) && Number.isFinite(liveFixture.stats.away.shots), 'live match stats are persisted');
