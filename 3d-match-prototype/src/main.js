@@ -213,7 +213,7 @@
   $("formationSelect").addEventListener("change",e=>applyFormation(e.target.value));
   $("strategySelect").addEventListener("change",e=>updateStrategy(e.target.value));
   $("cameraBtn").addEventListener("click",()=>{tacticalView=!tacticalView;camera.beta=tacticalView?.16:1.08;camera.radius=tacticalView?112:102;camera.lowerBetaLimit=tacticalView?.12:.72;camera.upperBetaLimit=tacticalView?.35:1.35;$("cameraBtn").textContent=tacticalView?"🎥 نمای تلویزیونی":"🎥 نمای تاکتیکی";log(tacticalView?"نمای تاکتیکی از بالا فعال شد.":"نمای تلویزیونی فعال شد.");});
-  $("speedBtn").addEventListener("click",()=>{simulationSpeed=simulationSpeed===1?2:simulationSpeed===2?.5:1;$("speedBtn").textContent="⏩ سرعت "+(simulationSpeed===.5?"۰٫۵×":simulationSpeed+"×");log("سرعت شبیه‌سازی تغییر کرد.");});
+  $("speedBtn").addEventListener("click",()=>{simulationSpeed=simulationSpeed===1?2:simulationSpeed===2?4:simulationSpeed===4?8:simulationSpeed===8?.5:1;$("speedBtn").textContent="⏩ سرعت "+(simulationSpeed===.5?"۰٫۵×":simulationSpeed+"×");log("سرعت شبیه‌سازی تغییر کرد.");});
   $("passBtn").addEventListener("click",()=>{if(!running&&!halftime&&!matchEnded)running=true;if(!owner)owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);chooseAction("pass");ui();});
   $("shootBtn").addEventListener("click",()=>{if(!running&&!halftime&&!matchEnded)running=true;if(!owner)owner=players.reduce((best,p)=>dist(p.root.position,ball.position)<dist(best.root.position,ball.position)?p:best,players[0]);chooseAction("shot");ui();});
   scene.onBeforeRenderObservable.add(()=>update(Math.min(engine.getDeltaTime()/1000,.05)));
