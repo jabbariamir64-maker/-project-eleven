@@ -87,7 +87,7 @@
     if(resultSent||matchParams.get("live")!=="1"||window.parent===window||!matchParams.get("fixture"))return;
     resultSent=true;
     const total=stats.possession[0]+stats.possession[1],homePoss=total?Math.round(stats.possession[0]/total*100):50;
-    window.parent.postMessage({type:"PROJECT_ELEVEN_MATCH_RESULT",fixtureId:matchParams.get("fixture"),homeId:matchParams.get("homeId"),awayId:matchParams.get("awayId"),homeGoals,awayGoals,goals:goalTimeline.slice(),stats:{home:{shots:stats.shots[0],onTarget:stats.onTarget[0],passes:stats.passes[0],tackles:stats.tackles[0],saves:stats.saves[0],possession:homePoss},away:{shots:stats.shots[1],onTarget:stats.onTarget[1],passes:stats.passes[1],tackles:stats.tackles[1],saves:stats.saves[1],possession:100-homePoss}}},window.location.origin);
+    window.parent.postMessage({type:"PROJECT_ELEVEN_MATCH_RESULT",fixtureId:matchParams.get("fixture"),homeId:matchParams.get("homeId"),awayId:matchParams.get("awayId"),homeGoals:homeScore,awayGoals:awayScore,goals:goalTimeline.slice(),stats:{home:{shots:stats.shots[0],onTarget:stats.onTarget[0],passes:stats.passes[0],tackles:stats.tackles[0],saves:stats.saves[0],possession:homePoss},away:{shots:stats.shots[1],onTarget:stats.onTarget[1],passes:stats.passes[1],tackles:stats.tackles[1],saves:stats.saves[1],possession:100-homePoss}}},window.location.origin);
     log("نتیجه مسابقه به لیگ PROJECT ELEVEN ارسال شد.");
   }
   function recordPossession(dt){if(owner){possessionTeam=owner.team;possessionClock+=dt;if(possessionClock>=1){const whole=Math.floor(possessionClock);stats.possession[possessionTeam]+=whole;possessionClock-=whole;updateStatsUI();}}}
