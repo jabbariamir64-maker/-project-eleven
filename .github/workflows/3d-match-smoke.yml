@@ -9,6 +9,9 @@ on:
       - 'tests/3d-match-long.cjs'
       - 'tests/game-integration-smoke.cjs'
       - 'js/game.js'
+      - 'index.html'
+      - 'styles.css'
+      - 'sw.js'
   workflow_dispatch:
 permissions:
   contents: read
