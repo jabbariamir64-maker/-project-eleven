@@ -367,7 +367,9 @@ stadium:[
 {capacity:26000,ticket:4,cost:26000000,title:"استادیوم حرفه‌ای",desc:"سکوهای پیوسته، نمایشگر بزرگ و فضای VIP."},
 {capacity:36000,ticket:5,cost:36000000,title:"ورزشگاه ملی",desc:"سازه چندطبقه و امکانات کامل مسابقه."},
 {capacity:50000,ticket:6,cost:50000000,title:"استادیوم الیت",desc:"جایگاه‌های مدرن، سقف گسترده و خدمات ویژه."},
-{capacity:70000,ticket:8,cost:70000000,title:"آرِنای PROJECT ELEVEN",desc:"بالاترین سطح؛ مجموعه عظیم با نورپردازی نمایشی."}
+{capacity:70000,ticket:8,cost:70000000,title:"آرِنای PROJECT ELEVEN",desc:"نورپردازی نمایشی و جایگاه‌های مدرن."},
+{capacity:95000,ticket:9,cost:95000000,title:"ورزشگاه قاره‌ای",desc:"گنجایش گسترده، جایگاه ویژه و امکانات حرفه‌ای."},
+{capacity:125000,ticket:10,cost:125000000,title:"ابرورزشگاه PROJECT ELEVEN",desc:"بزرگ‌ترین سطح باشگاه؛ گنجایش تا ۱۲۵ هزار تماشاگر."}
 ],
 training:[
 {cost:7000000,title:"زمین تمرین پایه",desc:"یک زمین استاندارد برای جلسات روزانه."},
@@ -388,7 +390,7 @@ academy:[
 {cost:60000000,title:"آکادمی نسل آینده",desc:"مرکز کامل پرورش استعدادهای ممتاز."}
 ]};
 function facilityArt(type,level){
-const l=clamp(Number(level)||1,1,7),sky=["#1b3153","#20395d","#264266","#2a496f","#314f76","#355783","#3c5e8d"][l-1];
+const l=clamp(Number(level)||1,1,9),sky=["#1b3153","#20395d","#264266","#2a496f","#314f76","#355783","#3c5e8d","#426a99","#4a76a8"][l-1];
 const stadium=type==="stadium",training=type==="training";
 const glow=stadium?"#72f5c2":training?"#7bb6ff":"#d5a8ff";
 const ground=stadium?"#287c68":training?"#287b58":"#287c68";
@@ -410,18 +412,18 @@ if(l>=6)scene+='<path d="M14 40 L14 32 L80 3 L146 32 L146 40" fill="none" stroke
 return '<div class="facility-art '+type+'-art level-'+l+'"><svg viewBox="0 0 160 94" role="img" aria-label="'+(stadium?"تصویر کارتونی ورزشگاه":training?"تصویر کارتونی مرکز تمرین":"تصویر کارتونی آکادمی جوانان")+' سطح '+l+'" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sky-'+type+'-'+l+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+sky+'"/><stop offset="1" stop-color="#10192d"/></linearGradient><linearGradient id="glass-'+type+'-'+l+'" x1="0" y1="0" x2="1" y2="1"><stop stop-color="'+glow+'" stop-opacity=".3"/><stop offset="1" stop-color="#dcecff" stop-opacity=".04"/></linearGradient></defs><rect width="160" height="94" rx="10" fill="url(#sky-'+type+'-'+l+')"/><circle cx="130" cy="18" r="13" fill="'+glow+'" fill-opacity=".12"/><circle cx="130" cy="18" r="7" fill="'+glow+'" fill-opacity=".14"/><path d="M0 80 Q40 66 78 79 T160 75 V94 H0Z" fill="#0c1728" fill-opacity=".65"/>'+scene+'<path d="M7 8 H42" stroke="'+glow+'" stroke-width="1.5" stroke-linecap="round"/><path d="M7 12 H28" stroke="#e9f1ff" stroke-opacity=".45" stroke-width="1"/><rect x="1" y="1" width="158" height="92" rx="9" fill="url(#glass-'+type+'-'+l+')" stroke="#e7f2ff" stroke-opacity=".22"/></svg><span class="art-level">LEVEL '+l+'</span></div>';
 }
 function stadiumMetrics(level,fans){
-const d=FACILITY_LEVELS.stadium[clamp(level,1,7)-1],crowd=Math.min(d.capacity,Math.max(1000,fans||12000)),attendance=Math.round(crowd*(.5+clamp(level,1,7)*.05));
+const d=FACILITY_LEVELS.stadium[clamp(level,1,9)-1],crowd=Math.min(d.capacity,Math.max(1000,fans||12000)),attendance=Math.round(crowd*(.5+clamp(level,1,9)*.035));
 return {...d,attendance,estimatedRevenue:attendance*d.ticket*1000,maintenance:Math.round((level||1)*150000)};
 }
 function facilitiesView(){
 const c=ccur(),f=c.facilities||(c.facilities={stadium:1,training:1,academy:1});
-Object.keys(f).forEach(k=>f[k]=clamp(Number(f[k])||1,1,7));
+Object.keys(f).forEach(k=>f[k]=clamp(Number(f[k])||1,1,k==="stadium"?9:7));
 const stadium=stadiumMetrics(f.stadium,c.fans), cards=[
 {k:"stadium",title:"ورزشگاه",tag:"MATCHDAY ARENA",level:f.stadium,levels:FACILITY_LEVELS.stadium,art:facilityArt("stadium",f.stadium),desc:"ظرفیت بیشتر یعنی صندلی بیشتر؛ درآمد واقعی بر اساس تعداد تماشاگر و قیمت بلیت محاسبه می‌شود."},
 {k:"training",title:"مرکز تمرین",tag:"PERFORMANCE CAMPUS",level:f.training,levels:FACILITY_LEVELS.training,art:facilityArt("training",f.training),desc:"هر سطح، بازده تمرین فنی را ۸٪ بیشتر از سطح پایه می‌کند."},
 {k:"academy",title:"آکادمی جوانان",tag:"YOUTH DEVELOPMENT",level:f.academy,levels:FACILITY_LEVELS.academy,art:facilityArt("academy",f.academy),desc:"سطح بالاتر شانس پیدا کردن بازیکن جوان آماده‌تر را بیشتر می‌کند."}
 ];
-return '<div class="hero-card facility-hero"><div><span class="eyebrow">CLUB DEVELOPMENT / 7 STAGES</span><h2>توسعه باشگاه</h2><p>هر مجموعه هفت مرحله دارد؛ تصویر و امکانات با ارتقا رشد می‌کنند و اثر هر خرید در اقتصاد یا پیشرفت تیم اعمال می‌شود.</p><span class="pill good">هواداران: '+num(c.fans||12000)+'</span></div><div class="hero-icon">✦</div></div><div class="facility-grid">'+cards.map(x=>{
+return '<div class="hero-card facility-hero"><div><span class="eyebrow">CLUB DEVELOPMENT / 9 STAGES</span><h2>توسعه باشگاه</h2><p>ورزشگاه ۹ سطح تا ظرفیت ۱۲۵ هزار نفر دارد؛ مرکز تمرین و آکادمی نیز با ارتقا روی رشد باشگاه اثر می‌گذارند.</p><span class="pill good">هواداران: '+num(c.fans||12000)+'</span></div><div class="hero-icon">✦</div></div><div class="facility-grid">'+cards.map(x=>{
 const current=x.levels[x.level-1],next=x.levels[x.level]||null,cost=next?next.cost:0;
 let metrics="";
 if(x.k==="stadium"){
@@ -432,12 +434,12 @@ metrics='<div class="facility-metrics"><div><small>بازده نسبت به پا
 }else{
 metrics='<div class="facility-metrics"><div><small>سطح استعداد</small><b>'+(["پایه","محلی","روبه‌رشد","حرفه‌ای","ملی","نخبه","نسل آینده"][x.level-1])+'</b></div><div><small>هزینه استعدادیابی</small><b>'+money(1500000+x.level*500000)+'</b></div></div>';
 }
-return '<section class="panel facility-card facility-'+x.k+'"><div class="facility-card-top"><div><span class="eyebrow">'+x.tag+'</span><h3>'+x.title+'</h3><p class="muted">'+x.desc+'</p></div><span class="facility-level-pill">مرحله '+num(x.level)+' از ۷</span></div><div class="facility-generated-art" style="height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:14px;background:linear-gradient(135deg,#0b1730,#1b3551);margin:12px 0">'+assetImage(x.k==="stadium"?"stadium":x.k==="training"?"coach":"player",c.id+"-"+x.k+"-"+x.level,x.title+" تصویر اختصاصی","facility-generated-image")+'</div>'+x.art+'<div class="facility-stagebar">'+Array.from({length:7},(_,i)=>'<span class="'+(i<x.level?"is-done":i===x.level?"is-next":"")+'"></span>').join("")+'</div><div class="facility-stage-copy"><b>'+current.title+'</b><span>'+(next?'مرحله بعد: '+next.title:'بالاترین سطح باز شده')+'</span></div>'+metrics+'<div class="facility-upgrade-row">'+(next?'<div><small>هزینه ارتقای بعدی</small><b>'+money(cost)+'</b></div><button class="btn primary" data-action="upgrade-facility" data-facility="'+x.k+'">ارتقا به مرحله '+num(x.level+1)+' ←</button>':'<span class="pill good">حداکثر سطح · مرحله ۷</span>')+'</div></section>';
+return '<section class="panel facility-card facility-'+x.k+'"><div class="facility-card-top"><div><span class="eyebrow">'+x.tag+'</span><h3>'+x.title+'</h3><p class="muted">'+x.desc+'</p></div><span class="facility-level-pill">مرحله '+num(x.level)+' از '+num(x.k==="stadium"?9:7)</span></div><div class="facility-generated-art" style="height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:14px;background:linear-gradient(135deg,#0b1730,#1b3551);margin:12px 0">'+assetImage(x.k==="stadium"?"stadium":x.k==="training"?"coach":"player",c.id+"-"+x.k+"-"+x.level,x.title+" تصویر اختصاصی","facility-generated-image")+'</div>'+x.art+'<div class="facility-stagebar">'+Array.from({length:7},(_,i)=>'<span class="'+(i<x.level?"is-done":i===x.level?"is-next":"")+'"></span>').join("")+'</div><div class="facility-stage-copy"><b>'+current.title+'</b><span>'+(next?'مرحله بعد: '+next.title:'بالاترین سطح باز شده')+'</span></div>'+metrics+'<div class="facility-upgrade-row">'+(next?'<div><small>هزینه ارتقای بعدی</small><b>'+money(cost)+'</b></div><button class="btn primary" data-action="upgrade-facility" data-facility="'+x.k+'">ارتقا به مرحله '+num(x.level+1)+' ←</button>':'<span class="pill good">حداکثر سطح · مرحله '+num(x.k==="stadium"?9:7)+'</span>')+'</div></section>';
 }).join("")+'</div><section class="panel facility-extra"><h3>🤝 قرارداد حامی مالی</h3><p class="muted">حامی مالی برای ثبت قرارداد پاداش اولیه می‌دهد و در بازی‌های خانگی درآمد اضافه می‌سازد.</p>'+(c.sponsor?'<span class="pill good">حامی فعلی: '+escapeHtml(c.sponsor.name)+' · درآمد خانگی '+money(c.sponsor.matchIncome)+'</span>':'<div class="btn-row"><button class="btn primary" data-action="sign-sponsor" data-sponsor="northstar">Northstar · قرارداد پایه</button><button class="btn ghost" data-action="sign-sponsor" data-sponsor="elite">Elite Sports · قرارداد ویژه</button></div>')+'</section><section class="panel facility-extra"><h3>استعدادیابی جوانان</h3><p class="muted">هر فصل یک‌بار می‌توانی با هزینه متناسب با سطح آکادمی، بازیکن ۱۶ تا ۱۹ ساله جذب کنی.</p>'+(c.academyScoutedSeason===state.season?'<span class="pill">این فصل انجام شده</span>':'<button class="btn green" data-action="scout-youth">پیدا کردن استعداد</button>')+'</section>';
 }
 function upgradeFacility(key){
 const c=ccur(),f=c.facilities||(c.facilities={stadium:1,training:1,academy:1});
-const level=clamp(Number(f[key])||1,1,7),next=FACILITY_LEVELS[key]?.[level];
+const level=clamp(Number(f[key])||1,1,key==="stadium"?9:7),next=FACILITY_LEVELS[key]?.[level];
 if(!next){toast("این مجموعه به بالاترین سطح رسیده است.");return}
 const cost=next.cost;
 if(c.budget<cost){toast("بودجه کافی نیست؛ هزینه ارتقای بعدی "+money(cost)+" است.");return}
@@ -481,7 +483,7 @@ if(p.trainingSessions.count>=3){toast("سهمیه تمرین این بازیکن
 const facility=(ccur().facilities||{}).training||1,age=Number(p.age)||24,potential=Number(p.potential)||calculateOverall(p);
 const ageFactor=age<=20?1.25:age<=24?1.05:age<=29?.8:age<=33?.55:.3;
 const talentFactor=.65+Math.max(0,potential-calculateOverall(p))/100;
-const gain=clamp(Math.round((.65+ageFactor*.65+talentFactor*.4)*(1+(facility-1)*.08)),1,3);
+const gain=age<20?Math.min(5,110-Number(p[key]||10)):clamp(Math.round((.65+ageFactor*.65+talentFactor*.4)*(1+(facility-1)*.08)),1,3);
 if(p[key]>=110){toast("این ویژگی به حداکثر ۱۱۰ رسیده است.");return}
 p[key]=clamp(p[key]+gain,10,110);p.fitness=clamp((p.fitness||80)-7,0,100);p.trainingSessions.count++;
 p.defense=Math.round((p.tackling+p.marking+p.positioning)/3);p.rating=calculateOverall(p);p.value=playerValue(p);
